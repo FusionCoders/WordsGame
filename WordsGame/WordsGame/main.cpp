@@ -102,7 +102,7 @@ vector<vector<pair<char, bool>>> Board::getBoard() const {
 
 bool Board::getEnd() const {
     bool gameOver = true;
-    for (int i = 0; i <= b.at(0).size(); i++) {
+    for (int i = 0; i <= b.at(0).size(); i++) { 
         gameOver = all_of(b.at(i).begin(), b.at(i).end(), [](const std::pair<char, bool>& p) {
 
             return p.first != ' ' || (p.first != ' ' && p.second == true);
@@ -408,7 +408,6 @@ int main() {
 
     while (!b.getEnd()) {
 
-        cout << "Feliz Natal!";
 
     }
 
