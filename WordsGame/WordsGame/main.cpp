@@ -104,7 +104,6 @@ bool Board::getEnd() const {
     bool gameOver = true;
     for (int i = 0; i <= b.at(0).size(); i++) { 
         gameOver = all_of(b.at(i).begin(), b.at(i).end(), [](const std::pair<char, bool>& p) {
-
             return p.first != ' ' || (p.first != ' ' && p.second == true);
             });
         if (!gameOver)
@@ -306,9 +305,10 @@ class ListPlayer
 {
 public:
     ListPlayer(int handBegin, Bag& letterBag);
+    vector<Player> getListPlayers() const;
     void showPlayers() const;
 private:
-    vector <Player> playersList;
+    vector<Player> playersList;
 };
 
 //--------------------------------------------------------------------------------
@@ -340,6 +340,13 @@ ListPlayer::ListPlayer(int handBegin, Bag& letterBag) {
         playersList.push_back(p);
     }
     cout << endl;
+}
+
+//--------------------------------------------------------------------------------
+// GETS AND SETS
+
+vector <Player> ListPlayer::getListPlayers() const {
+    return playersList;
 }
 
 //--------------------------------------------------------------------------------
@@ -406,8 +413,13 @@ int main() {
     ListPlayer listPlayer(handBegin, letterBag);
     listPlayer.showPlayers();
 
-    while (!b.getEnd()) {
 
+    while (!b.getEnd()) {
+        /*for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
+            listPlayer.getListPlayers().at(i).play(b);
+            if (!b.getEnd())
+                break;
+        }*/
 
     }
 
