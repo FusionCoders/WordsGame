@@ -45,8 +45,8 @@ public:
     //Board(int numLins, int numCols);
     Board(const string& filename); // constructor
     void show() const; // const method (NOTE: const methods cannot modify the attributes)
-    vector<vector<pair<char, bool>>> getBoard() const; // const method
-    bool getEnd() const; // const method
+    vector<vector<pair<char, bool>>> getBoard() const; 
+    bool getEnd() const;
 private:
     vector<vector<pair<char, bool>>> b; //False --> letter not covered / True --> letter covered
 };
@@ -67,9 +67,9 @@ Board::Board(const string& filename) {
     int numLins, numCols;
     iss >> dummy >> dummy >> dummy >> numLins >> dummy >> numCols; // read values from 'boardSize' and store integers 'numLins' and 'numCols' 
     b = vector<vector<pair<char, bool>>>(numLins, vector<pair<char, bool>>(numCols, make_pair(' ', false))); // create a bidimensional matrix 'b' 
-    // with dimensions 'numLins' by 'numCols';
-    // initialize each element as a pair<char, bool> 
-    // with a space character (' ') and false
+                                                                                        // with dimensions 'numLins' by 'numCols';
+                                                                                        // initialize each element as a pair<char, bool> 
+                                                                                        // with a space character (' ') and false
 // jump to line 5 (where the board starts)
     for (int i = 0; i < 4; ++i)
         getline(f, dummy);
