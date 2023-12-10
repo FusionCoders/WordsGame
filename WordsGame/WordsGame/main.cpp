@@ -407,7 +407,7 @@ int main() {
     while (!b.getEnd()) {
 
         cout << "Hello World!!!!";
-        cout << "Hello World!!!!";
+        cout << "Hello World!";
 
     }
 
