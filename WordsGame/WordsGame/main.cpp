@@ -408,7 +408,7 @@ int main() {
 
     while (!b.getEnd()) {
 
-        cout << "Feliz Natal!!!! Yeyyy holaaaaa";
+        cout << "Feliz Natal!";
 
     }
 
