@@ -367,6 +367,8 @@ void readHandBegin(int& handBegin, Bag& letterBag) {
         if (cin >> handBegin) {
             if (handBegin <= (letterBag.getLetters().size() / 4)) {
                 isValid = true;
+                // clean input buffer
+                cin.ignore(1000, '\n');
             }
         }
         if (!isValid) {
