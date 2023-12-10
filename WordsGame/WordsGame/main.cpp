@@ -143,7 +143,8 @@ class Bag
 {
 public:
     Bag(const Board& b);
-    vector<char>& getLetters();
+    vector<char> getLetters();
+    void deleteLetters(int i);
     void showLetters() const;
 private:
     vector<char> letters;
@@ -172,8 +173,15 @@ Bag::Bag(const Board& b)
 //--------------------------------------------------------------------------------
 // GETS AND SETS
 
-vector<char>& Bag::getLetters() {
+vector<char> Bag::getLetters() {
     return letters;
+}
+
+//--------------------------------------------------------------------------------
+// DELETE LETTERS FROM THE BAG
+
+void Bag::deleteLetters(int i) {
+    letters.erase(letters.begin() + i);
 }
 
 //--------------------------------------------------------------------------------
@@ -213,7 +221,7 @@ Hand::Hand(int handBegin, Bag& letterBag) {
     for (int i = 0; i < handBegin; i++) {
         char randomLetter = letterBag.getLetters().at(i);
         playerHand.push_back(randomLetter);
-        letterBag.getLetters().erase(letterBag.getLetters().begin() + i);
+        letterBag.deleteLetters(i);
     }
 }
 
@@ -238,6 +246,7 @@ public:
     Player(int id, int handBegin, Bag& letterBag);
     int getId() const;
     string getName() const;
+    void play();
     void showPlayer() const;
 private:
     int id_;
@@ -283,6 +292,22 @@ int Player::getId() const {
 
 string Player::getName() const {
     return name_;
+}
+
+//--------------------------------------------------------------------------------
+// PLAY LETTERS
+
+void Player::play() {
+    bool isValid = false;
+    string letter;
+
+    do {
+        hand_.showHand();
+        cout << "In which position do you want to play (Lc)? ";
+        getline(cin, letter);
+
+    } while (!isValid);
+
 }
 
 //--------------------------------------------------------------------------------
@@ -413,13 +438,15 @@ int main() {
     ListPlayer listPlayer(handBegin, letterBag);
     listPlayer.showPlayers();
 
+    letterBag.showLetters();
+
 
     while (!b.getEnd()) {
-        /*for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
+        for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
             listPlayer.getListPlayers().at(i).play(b);
             if (!b.getEnd())
                 break;
-        }*/
+        }
 
     }
 
