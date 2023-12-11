@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
-//#include <random>
 //--------------------------------------------------------------------------------
 using namespace std;
 //================================================================================
@@ -246,12 +245,8 @@ Bag::Bag(const Board b)
             }
         }
     }
-    //// Use a random number generator
-    //random_device rd;
-    //mt19937 g(rd());
-    //// Shuffle the elements in the vector
-    //std::shuffle(letters.begin(), letters.end(), g);
 
+    srand(static_cast<unsigned int>(time(0))); // use current time as seed for random generator
     random_shuffle(letters.begin(), letters.end()); // rearrange the elements in the vector "letters" randomly
 }
 
