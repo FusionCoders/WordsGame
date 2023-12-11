@@ -46,6 +46,7 @@ public:
     Board(const string& filename); // constructor
     void show() const; // const method (NOTE: const methods cannot modify the attributes)
     vector<vector<pair<char, bool>>> getBoard() const; 
+    vector<char> getPlayableLetters() const;
     bool getEnd() const;
 private:
     vector<vector<pair<char, bool>>> b; //False --> letter not covered / True --> letter covered
@@ -102,7 +103,7 @@ vector<vector<pair<char, bool>>> Board::getBoard() const {
 
 bool Board::getEnd() const {
     bool gameOver = true;
-    for (int i = 0; i <= b.at(0).size(); i++) { 
+    for (int i = 0; i < b.at(0).size(); i++) { 
         gameOver = all_of(b.at(i).begin(), b.at(i).end(), [](const std::pair<char, bool>& p) {
             return p.first != ' ' || (p.first != ' ' && p.second == true);
             });
@@ -110,6 +111,83 @@ bool Board::getEnd() const {
             break;
     }
     return gameOver;
+}
+
+//--------------------------------------------------------------------------------
+// GET A VECTOR WITH ALL LETTERS IN PLAYABLE POSITIONS
+
+vector<char> Board::getPlayableLetters() const{
+    vector<char> playableLetters;
+    bool playable;
+    for (int i = 0; i < b.at(0).size(); i++) { // scroll through each line
+        for (int j = 0; j < b.at(1).size(); j++) { // scroll through each column
+            playable = true; // playable until proven otherwise
+            if (isalpha(b.at(i).at(j).first)) { // true if it is a letter
+                if (!b.at(i).at(j).second) { // true if it is a letter that was not played yet
+                    if (i == 0) {
+                        if (!isalpha(b.at(i + 1).at(j).first))
+                            playable = false; // letter has nothing after in the column
+                    }
+                    else if (i == b.at(0).size() - 1) {
+                        if (!isalpha(b.at(i - 1).at(j).first))
+                            playable = false; // letter has nothing before in the column
+                    }
+                    else {
+                        if ((isalpha(b.at(i - 1).at(j).first) == 0 && isalpha(b.at(i + 1).at(j).first) == 0)) 
+                            playable = false; // letter has nothing before and after in the column
+                    }
+                    if (playable) {
+                        for (int p = i; p > 0; p--) { // scroll up through the column
+                            if (isalpha(b.at(i - (i - p) - 1).at(j).first)) { // true if it is a letter
+                                if (!b.at(i - (i - p) - 1).at(j).second) { // true if it is a letter that was not played yet
+                                    playable = false; // letter not playable once there is a letter before consecutive without being played
+                                }
+                            }
+                            else {
+                                break; // break as soon as it find a space
+                            }
+                        }
+                    }
+                    if (playable) { 
+                        playableLetters.push_back(b.at(i).at(j).first); // add letter to the vector   
+                    }
+                    else { // is gonna check in the line if is valid
+                        playable = true; // playable until proven otherwise
+                        if (j == 0) {
+                            if (!isalpha(b.at(i).at(j + 1).first))
+                                playable = false; // letter has nothing after in the column
+                        }
+                        else if (j == b.at(1).size() - 1) {
+                            if (!isalpha(b.at(i).at(j - 1).first))
+                                playable = false; // letter has nothing before in the column
+                        }
+                        else {
+                            if (isalpha(b.at(i).at(j - 1).first) == 0 && isalpha(b.at(i).at(j + 1).first) == 0) {
+                                playable = false; // letter has nothing before and after in the line
+                            }
+                        }                      
+                        if (playable) {
+                            for (int l = j; l > 0; l--) { // scroll backwards through the line
+                                if (isalpha(b.at(i).at(j - (j - l) - 1).first)) { // true if it is a letter
+                                    if (!b.at(i).at(j - (j - l) - 1).second) { // true if it is a letter that was not played yet
+                                        playable = false; // letter not playable once there is a letter before consecutive without being played
+                                    }
+                                }
+                                else {
+                                    break; // break as soon as it find a space
+                                }
+                            }
+                        }
+                        if (playable) {
+                            playableLetters.push_back(b.at(i).at(j).first); // add letter to the vector   
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return playableLetters;
 }
 
 //--------------------------------------------------------------------------------
@@ -205,6 +283,8 @@ class Hand
 public:
     Hand();
     Hand(int handBegin, Bag& letterBag);
+    bool checkIfCanPlay(Board b);
+    bool validMoveExist(vector<char> playableLetters);
     void showHand() const;
 private:
     vector<char> playerHand;
@@ -223,6 +303,47 @@ Hand::Hand(int handBegin, Bag& letterBag) {
         playerHand.push_back(randomLetter);
         letterBag.deleteLetters(i);
     }
+}
+
+//--------------------------------------------------------------------------------
+// CHECK IF CAN PLAY
+
+bool Hand::checkIfCanPlay(Board b) {
+    vector<char> playableLetters = b.getPlayableLetters();
+    if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
+        return true;
+    }
+    else { // if there is no valid moves it asks for substitutions in the hand                                              
+        cout << RED << "You have no play options!" << endl << NO_COLOR;
+        cout << " " << endl;
+        
+
+    }
+    if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
+        return true;
+    }
+    else {
+        cout << RED << "Still have no play options!" << endl << NO_COLOR;
+        return false; // the player is not gonna play
+    }
+}
+
+//--------------------------------------------------------------------------------
+// CHECK IF THERE IS A VALID MOVE
+
+bool Hand::validMoveExist(vector<char> playableLetters) {
+    /*cout << "Playable letters";
+    for (char letter : playableLetters) {
+        cout << letter << ' ';
+    }*/
+    for (char ch1 : playableLetters) {
+        for (char ch2 : playerHand) {
+            if (ch1 == ch2) {
+                return true; // common character found between the player's hand and the playable letters on the board
+            }
+        }
+    }
+    return false;
 }
 
 //--------------------------------------------------------------------------------
@@ -246,7 +367,7 @@ public:
     Player(int id, int handBegin, Bag& letterBag);
     int getId() const;
     string getName() const;
-    void play();
+    void play(Board& b);
     void showPlayer() const;
 private:
     int id_;
@@ -297,16 +418,18 @@ string Player::getName() const {
 //--------------------------------------------------------------------------------
 // PLAY LETTERS
 
-void Player::play() {
-    bool isValid = false;
-    string letter;
+void Player::play(Board& b) {
+    if (hand_.checkIfCanPlay(b)) {
 
-    do {
-        hand_.showHand();
-        cout << "In which position do you want to play (Lc)? ";
-        getline(cin, letter);
+        bool isValid = false;
+        string letter;
+        do {
+            hand_.showHand();
+            cout << "In which position do you want to play (Lc)? ";
+            getline(cin, letter);
 
-    } while (!isValid);
+        } while (!isValid);
+    }
 
 }
 
@@ -438,8 +561,6 @@ int main() {
     ListPlayer listPlayer(handBegin, letterBag);
     listPlayer.showPlayers();
 
-    letterBag.showLetters();
-
 
     while (!b.getEnd()) {
         for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
@@ -447,6 +568,8 @@ int main() {
             if (!b.getEnd())
                 break;
         }
+        int i;
+        cin >> i;
 
     }
 
