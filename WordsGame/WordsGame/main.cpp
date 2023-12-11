@@ -321,7 +321,7 @@ bool Hand::checkIfCanPlay(Board b) {
         return true;
     }
     else { // if there is no valid moves it asks for substitutions in the hand                                              
-        cout << RED << "You have no play options!" << endl << NO_COLOR;
+        cout << BLUE << "You have no play options!" << endl << NO_COLOR;
         cout << " " << endl;
         
 
@@ -330,7 +330,7 @@ bool Hand::checkIfCanPlay(Board b) {
         return true;
     }
     else {
-        cout << RED << "Still have no play options!" << endl << NO_COLOR;
+        cout << BLUE << "Still have no play options!" << endl << NO_COLOR;
         return false; // the player is not gonna play
     }
 }
