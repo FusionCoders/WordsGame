@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
+//#include <random>
 //--------------------------------------------------------------------------------
 using namespace std;
 //================================================================================
@@ -245,6 +246,12 @@ Bag::Bag(const Board& b)
             }
         }
     }
+    //// Use a random number generator
+    //random_device rd;
+    //mt19937 g(rd());
+    //// Shuffle the elements in the vector
+    //std::shuffle(letters.begin(), letters.end(), g);
+
     random_shuffle(letters.begin(), letters.end()); // rearrange the elements in the vector "letters" randomly
 }
 
@@ -332,10 +339,6 @@ bool Hand::checkIfCanPlay(Board b) {
 // CHECK IF THERE IS A VALID MOVE
 
 bool Hand::validMoveExist(vector<char> playableLetters) {
-    /*cout << "Playable letters";
-    for (char letter : playableLetters) {
-        cout << letter << ' ';
-    }*/
     for (char ch1 : playableLetters) {
         for (char ch2 : playerHand) {
             if (ch1 == ch2) {
