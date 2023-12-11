@@ -287,6 +287,7 @@ public:
     Hand(int handBegin, Bag letterBag);
     bool checkIfCanPlay(Board b, Bag letterBag);
     bool validMoveExist(vector<char> playableLetters);
+    vector<char> readLetterToChange(int i);
     void showHand() const;
 private:
     vector<char> playerHand;
@@ -318,28 +319,82 @@ bool Hand::checkIfCanPlay(Board b, Bag letterbag) {
     else { // if there is no valid moves it asks for substitutions in the hand                                              
         cout << BLUE << "You have no play options!" << endl << NO_COLOR;
         cout << " " << endl;
+        vector<char> selectedLetters;
+        int aux = 0;
         if (letterbag.getLetters().size() == 0) { // true if the bag is empty
             cout << BLUE << "The bag is empty, you cannot change letters, your turn has passed!" << endl << NO_COLOR;
             return false; // the player is not gonna play
         }
         else if (letterbag.getLetters().size() == 1) { // true if the bag has only 1 letter
             cout << BLUE << "You can only exchange one letter from your hand with the bag!" << endl << NO_COLOR;
-            cout << "Which hand letter do you want to change ? " << endl;
-
-
+            aux = 1;
         }
         else {
-
-
+            cout << BLUE << "You can exchange one or two letters from your hand with the bag!" << endl << NO_COLOR;
+            aux = 2;
+        }
+        if (aux != 0) {
+            bool isValid = false;
+            do {
+                if (aux == 1)
+                    selectedLetters = readLetterToChange(0); // can return one letter or QUIT or PASS
+                else
+                    selectedLetters = readLetterToChange(1); // can return one or two letters or QUIT or PASS
+                if (selectedLetters.at(0) == 'P' && selectedLetters.at(1) == 'A' && selectedLetters.at(2) == 'S' && selectedLetters.at(3) == 'S') {
+                    cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
+                    return false;
+                }
+                else if (selectedLetters.at(0) == 'Q' && selectedLetters.at(1) == 'U' && selectedLetters.at(2) == 'I' && selectedLetters.at(3) == 'T') {
+                    //deletePlayer(); // it returns true if the player was deleted correctely
+                    cout << BLUE << "You quit the game!" << endl << NO_COLOR;
+                    return false;
+                }
+                //else
+                    //isValid = changeHand(); // do the substitution and it returns true if the substitution was completed correctely        
+            } while (!isValid);
             if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
                 return true;
             }
             else {
                 cout << BLUE << "Still have no play options!" << endl << NO_COLOR;
                 return false; // the player is not gonna play
-            }  
+            } 
         }
     }
+}
+
+//--------------------------------------------------------------------------------
+// READ LETTERS FROM HAND TO CHANGE
+
+vector<char> Hand::readLetterToChange(int i) {
+    string input;
+    do {
+        if(i == 0) // Can only change one letter;
+            cout << "Which hand letter do you want to change (QUIT/PASS)? " << endl;
+        else // Can change one or two letters;
+            cout << "Which hand letter/s do you want to change (QUIT/PASS)? " << endl;
+        if (getline(cin, input)) {
+            if (input == "QUIT" || input == "PASS") { // check if the person wants to quit or pass
+                return { input[0], input[1], input[2], input[3] };
+            }
+            else {
+                if (i == 0) { // to the case where there is only one letter in the bag
+                    if (input.size() == 1)
+                        return { input[0] };
+                    else
+                        cout << RED << "You can only choose one letter from your hand! " << endl << NO_COLOR;
+                }
+                else { // to the case where there is two or more letters in the bag
+                    if (input.size() == 1) // if input is only one letter
+                        return { input[0] };
+                    else if (input.size() == 3 && input[1] == ' ') // if input is two letters separeted bu a space
+                        return { input[0], input[2] };
+                    else
+                        cout << RED << "You can only choose one or two letter from your hand separated by space! " << endl << NO_COLOR;
+                }
+            }                
+        }
+    } while (true);
 }
 
 //--------------------------------------------------------------------------------
