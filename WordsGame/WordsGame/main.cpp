@@ -290,7 +290,7 @@ class Hand
 public:
     Hand();
     Hand(int handBegin, Bag& letterBag);
-    bool checkIfCanPlay(Board b);
+    bool checkIfCanPlay(Board b, Bag& letterBag);
     bool validMoveExist(vector<char> playableLetters);
     void showHand() const;
 private:
@@ -315,7 +315,7 @@ Hand::Hand(int handBegin, Bag& letterBag) {
 //--------------------------------------------------------------------------------
 // CHECK IF CAN PLAY
 
-bool Hand::checkIfCanPlay(Board b) {
+bool Hand::checkIfCanPlay(Board b, Bag& letterbag) {
     vector<char> playableLetters = b.getPlayableLetters();
     if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
         return true;
@@ -323,15 +323,27 @@ bool Hand::checkIfCanPlay(Board b) {
     else { // if there is no valid moves it asks for substitutions in the hand                                              
         cout << BLUE << "You have no play options!" << endl << NO_COLOR;
         cout << " " << endl;
-        
+        if (letterbag.getLetters().size() == 0) { // true if the bag is empty
+            cout << BLUE << "The bag is empty, you cannot change letters, your turn has passed!" << endl << NO_COLOR;
+            return false; // the player is not gonna play
+        }
+        else if (letterbag.getLetters().size() == 1) { // true if the bag has only 1 letter
+            cout << BLUE << "You can only exchange one letter from your hand with the bag!" << endl << NO_COLOR;
+            cout << "Which hand letter do you want to change ? " << endl;
 
-    }
-    if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
-        return true;
-    }
-    else {
-        cout << BLUE << "Still have no play options!" << endl << NO_COLOR;
-        return false; // the player is not gonna play
+            
+        }
+        else {
+
+
+            if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
+                return true;
+            }
+            else {
+                cout << BLUE << "Still have no play options!" << endl << NO_COLOR;
+                return false; // the player is not gonna play
+            }  
+        }
     }
 }
 
@@ -370,7 +382,7 @@ public:
     Player(int id, int handBegin, Bag& letterBag);
     int getId() const;
     string getName() const;
-    void play(Board& b);
+    void play(Board& b, Bag& letterBag);
     void showPlayer() const;
 private:
     int id_;
@@ -421,8 +433,9 @@ string Player::getName() const {
 //--------------------------------------------------------------------------------
 // PLAY LETTERS
 
-void Player::play(Board& b) {
-    if (hand_.checkIfCanPlay(b)) {
+void Player::play(Board& b, Bag& letterBag) {
+    hand_.showHand();
+    if (hand_.checkIfCanPlay(b, letterBag)) {
 
         bool isValid = false;
         string letter;
@@ -567,7 +580,7 @@ int main() {
 
     while (!b.getEnd()) {
         for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
-            listPlayer.getListPlayers().at(i).play(b);
+            listPlayer.getListPlayers().at(i).play(b, letterBag);
             if (!b.getEnd())
                 break;
         }
