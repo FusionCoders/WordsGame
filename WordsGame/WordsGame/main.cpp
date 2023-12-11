@@ -288,7 +288,7 @@ public:
     bool checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char>& playableLetters);
     vector<char> readLetterToChange(int i);
-    bool changeHand(Bag& letterbag);
+    bool changeHand(vector<char>& letterbag);
     void showHand() const;
 private:
     vector<char> playerHand;
@@ -351,7 +351,7 @@ bool Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
                     return false;
                 }
                 else
-                    isValid = changeHand(letterbag); // do the substitution and it returns true if the substitution was completed correctely        
+                    isValid = changeHand(selectedLetters); // do the substitution and it returns true if the substitution was completed correctely        
             } while (!isValid);
             if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
                 return true;
@@ -401,8 +401,15 @@ vector<char> Hand::readLetterToChange(int i) {
 //--------------------------------------------------------------------------------
 // CHANGE LETTERS BETWEEN HAND AND BAG
 
-bool Hand::changeHand(Bag& letterbag) {
-
+bool Hand::changeHand(vector<char>& lettersSelected) {
+    for (char ch1 : lettersSelected) {
+        for (char ch2 : playerHand) {
+            if (ch1 == ch2) { // common character found between the player's hand and letters selected
+                 
+            }
+        }
+    }
+    return false;
 }
 
 
@@ -645,7 +652,7 @@ int main() {
             if (listPlayer.getListPlayers().at(i).getHand().checkIfCanPlay(b, letterBag)) {
                 listPlayer.getListPlayers().at(i).play(b, letterBag);
             }
-            if (!b.getEnd())
+            if (b.getEnd())
                 break;
         }
     }
