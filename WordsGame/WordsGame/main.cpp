@@ -286,7 +286,7 @@ public:
     Hand();
     Hand(int handBegin, Bag& letterBag);
     bool checkIfCanPlay(Board& b, Bag& letterBag);
-    bool validMoveExist(vector<char> playableLetters);
+    bool validMoveExist(vector<char>& playableLetters);
     vector<char> readLetterToChange(int i);
     bool changeHand(Bag& letterbag);
     void showHand() const;
@@ -409,7 +409,7 @@ bool Hand::changeHand(Bag& letterbag) {
 //--------------------------------------------------------------------------------
 // CHECK IF THERE IS A VALID MOVE
 
-bool Hand::validMoveExist(vector<char> playableLetters) {
+bool Hand::validMoveExist(vector<char>& playableLetters) {
     for (char ch1 : playableLetters) {
         for (char ch2 : playerHand) {
             if (ch1 == ch2) {
