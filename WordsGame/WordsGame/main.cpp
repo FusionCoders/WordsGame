@@ -43,7 +43,7 @@ using namespace std;
 class Board {
 public:
     //Board(int numLins, int numCols);
-    Board(const string filename); // constructor
+    Board(const string& filename); // constructor
     void show() const; // const method (NOTE: const methods cannot modify the attributes)
     vector<vector<pair<char, bool>>> getBoard() const; 
     vector<char> getPlayableLetters() const;
@@ -55,7 +55,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-Board::Board(const string filename) {
+Board::Board(const string& filename) {
     ifstream f(filename); // open an input file stream to read from a file with the name specified in 'filename'
     if (!(f.is_open())) { // 'is_open()' test whether the file is already open, if is not an error message will show
         cerr << "File not found!" << endl;
@@ -220,7 +220,7 @@ void Board::show() const {
 class Bag
 {
 public:
-    Bag(const Board b);
+    Bag(const Board& b);
     vector<char> getLetters();
     void deleteLetters(int i);
     void showLetters() const;
@@ -231,7 +231,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-Bag::Bag(const Board b)
+Bag::Bag(const Board& b)
 {
     // read a line
     for (int i = 0; i < b.getBoard().at(0).size(); ++i)
@@ -284,10 +284,11 @@ class Hand
 {
 public:
     Hand();
-    Hand(int handBegin, Bag letterBag);
-    bool checkIfCanPlay(Board b, Bag letterBag);
+    Hand(int handBegin, Bag& letterBag);
+    bool checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char> playableLetters);
     vector<char> readLetterToChange(int i);
+    bool changeHand(Bag& letterbag);
     void showHand() const;
 private:
     vector<char> playerHand;
@@ -300,7 +301,7 @@ Hand::Hand() {
     // nothing to do here, the vector<char> playerHand will be created empty automatically
 }
 
-Hand::Hand(int handBegin, Bag letterBag) {
+Hand::Hand(int handBegin, Bag& letterBag) {
     for (int i = 0; i < handBegin; i++) {
         char randomLetter = letterBag.getLetters().at(i);
         playerHand.push_back(randomLetter);
@@ -311,7 +312,7 @@ Hand::Hand(int handBegin, Bag letterBag) {
 //--------------------------------------------------------------------------------
 // CHECK IF CAN PLAY
 
-bool Hand::checkIfCanPlay(Board b, Bag letterbag) {
+bool Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
     vector<char> playableLetters = b.getPlayableLetters();
     if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
         return true;
@@ -349,8 +350,8 @@ bool Hand::checkIfCanPlay(Board b, Bag letterbag) {
                     cout << BLUE << "You quit the game!" << endl << NO_COLOR;
                     return false;
                 }
-                //else
-                    //isValid = changeHand(); // do the substitution and it returns true if the substitution was completed correctely        
+                else
+                    isValid = changeHand(letterbag); // do the substitution and it returns true if the substitution was completed correctely        
             } while (!isValid);
             if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
                 return true;
@@ -398,6 +399,14 @@ vector<char> Hand::readLetterToChange(int i) {
 }
 
 //--------------------------------------------------------------------------------
+// CHANGE LETTERS BETWEEN HAND AND BAG
+
+bool Hand::changeHand(Bag& letterbag) {
+
+}
+
+
+//--------------------------------------------------------------------------------
 // CHECK IF THERE IS A VALID MOVE
 
 bool Hand::validMoveExist(vector<char> playableLetters) {
@@ -429,11 +438,11 @@ void Hand::showHand() const {
 class Player
 {
 public:
-    Player(int id, int handBegin, Bag letterBag);
+    Player(int id, int handBegin, Bag& letterBag);
     int getId() const;
     string getName() const;
     Hand getHand() const;
-    void play(Board b, Bag letterBag);
+    void play(Board& b, Bag& letterBag);
     void showPlayer() const;
 private:
     int id_;
@@ -445,7 +454,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-Player::Player(const int id, const int handBegin, Bag letterBag) {
+Player::Player(const int id, const int handBegin, Bag& letterBag) {
     bool isValid = false;
     string name;
     do {
@@ -488,7 +497,7 @@ Hand Player::getHand() const {
 //--------------------------------------------------------------------------------
 // PLAY LETTERS
 
-void Player::play(Board b, Bag letterBag) {
+void Player::play(Board& b, Bag& letterBag) {
     bool isValid = false;
     string letter;
     do {
@@ -520,7 +529,7 @@ void Player::showPlayer() const {
 class ListPlayer
 {
 public:
-    ListPlayer(int handBegin, Bag letterBag);
+    ListPlayer(int handBegin, Bag& letterBag);
     vector<Player> getListPlayers() const;
     void showPlayers() const;
 private:
@@ -530,7 +539,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-ListPlayer::ListPlayer(int handBegin, Bag letterBag) {
+ListPlayer::ListPlayer(int handBegin, Bag& letterBag) {
     bool isValid = false;
     int num;
     do {
