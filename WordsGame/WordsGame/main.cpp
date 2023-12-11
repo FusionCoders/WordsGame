@@ -288,7 +288,7 @@ public:
     bool checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char>& playableLetters);
     vector<char> readLetterToChange(int i);
-    bool changeHand(vector<char>& letterbag);
+    bool changeHand(vector<char>& lettersSelected, Bag& letterbag);
     void showHand() const;
 private:
     vector<char> playerHand;
@@ -326,7 +326,7 @@ bool Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
             cout << BLUE << "The bag is empty, you cannot change letters, your turn has passed!" << endl << NO_COLOR;
             return false; // the player is not gonna play
         }
-        else if (letterbag.getLetters().size() == 1) { // true if the bag has only 1 letter
+        else if (letterbag.getLetters().size() == 1 || playerHand.size() == 1) { // true if the bag has only 1 letter
             cout << BLUE << "You can only exchange one letter from your hand with the bag!" << endl << NO_COLOR;
             aux = 1;
         }
@@ -351,7 +351,7 @@ bool Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
                     return false;
                 }
                 else
-                    isValid = changeHand(selectedLetters); // do the substitution and it returns true if the substitution was completed correctely        
+                    isValid = changeHand(selectedLetters, letterbag); // do the substitution and it returns true if the substitution was completed correctely        
             } while (!isValid);
             if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
                 return true;
@@ -401,15 +401,24 @@ vector<char> Hand::readLetterToChange(int i) {
 //--------------------------------------------------------------------------------
 // CHANGE LETTERS BETWEEN HAND AND BAG
 
-bool Hand::changeHand(vector<char>& lettersSelected) {
-    for (char ch1 : lettersSelected) {
-        for (char ch2 : playerHand) {
-            if (ch1 == ch2) { // common character found between the player's hand and letters selected
-                 
-            }
-        }
+bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
+    // Order the vectors, as includes requires that the ranges are ordered
+    sort(lettersSelected.begin(), lettersSelected.end());
+    sort(playerHand.begin(), playerHand.end());
+    // Check if all elements of lettersSelected are contained in playerHand
+    if (includes(playerHand.begin(), playerHand.end(), lettersSelected.begin(), lettersSelected.end())) {
+        // It will find the last letters from the bag and replace them with the letters in the hand selected in lettersSelected
+
+        cout << BLUE << "Your hand as changed!" << endl;
+        showHand;
+        return true;
     }
-    return false;
+    else {
+        cout << RED << "You can only select letters that are present in your hand!" << endl << NO_COLOR;
+        showHand();
+        return false;
+    }
+    
 }
 
 
