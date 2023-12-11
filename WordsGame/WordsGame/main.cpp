@@ -44,7 +44,7 @@ using namespace std;
 class Board {
 public:
     //Board(int numLins, int numCols);
-    Board(const string& filename); // constructor
+    Board(const string filename); // constructor
     void show() const; // const method (NOTE: const methods cannot modify the attributes)
     vector<vector<pair<char, bool>>> getBoard() const; 
     vector<char> getPlayableLetters() const;
@@ -56,7 +56,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-Board::Board(const string& filename) {
+Board::Board(const string filename) {
     ifstream f(filename); // open an input file stream to read from a file with the name specified in 'filename'
     if (!(f.is_open())) { // 'is_open()' test whether the file is already open, if is not an error message will show
         cerr << "File not found!" << endl;
@@ -221,7 +221,7 @@ void Board::show() const {
 class Bag
 {
 public:
-    Bag(const Board& b);
+    Bag(const Board b);
     vector<char> getLetters();
     void deleteLetters(int i);
     void showLetters() const;
@@ -232,7 +232,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-Bag::Bag(const Board& b)
+Bag::Bag(const Board b)
 {
     // read a line
     for (int i = 0; i < b.getBoard().at(0).size(); ++i)
@@ -289,8 +289,8 @@ class Hand
 {
 public:
     Hand();
-    Hand(int handBegin, Bag& letterBag);
-    bool checkIfCanPlay(Board b, Bag& letterBag);
+    Hand(int handBegin, Bag letterBag);
+    bool checkIfCanPlay(Board b, Bag letterBag);
     bool validMoveExist(vector<char> playableLetters);
     void showHand() const;
 private:
@@ -304,7 +304,7 @@ Hand::Hand() {
     // nothing to do here, the vector<char> playerHand will be created empty automatically
 }
 
-Hand::Hand(int handBegin, Bag& letterBag) {
+Hand::Hand(int handBegin, Bag letterBag) {
     for (int i = 0; i < handBegin; i++) {
         char randomLetter = letterBag.getLetters().at(i);
         playerHand.push_back(randomLetter);
@@ -315,7 +315,7 @@ Hand::Hand(int handBegin, Bag& letterBag) {
 //--------------------------------------------------------------------------------
 // CHECK IF CAN PLAY
 
-bool Hand::checkIfCanPlay(Board b, Bag& letterbag) {
+bool Hand::checkIfCanPlay(Board b, Bag letterbag) {
     vector<char> playableLetters = b.getPlayableLetters();
     if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
         return true;
@@ -331,7 +331,7 @@ bool Hand::checkIfCanPlay(Board b, Bag& letterbag) {
             cout << BLUE << "You can only exchange one letter from your hand with the bag!" << endl << NO_COLOR;
             cout << "Which hand letter do you want to change ? " << endl;
 
-            
+
         }
         else {
 
@@ -379,10 +379,11 @@ void Hand::showHand() const {
 class Player
 {
 public:
-    Player(int id, int handBegin, Bag& letterBag);
+    Player(int id, int handBegin, Bag letterBag);
     int getId() const;
     string getName() const;
-    void play(Board& b, Bag& letterBag);
+    Hand getHand() const;
+    void play(Board b, Bag letterBag);
     void showPlayer() const;
 private:
     int id_;
@@ -394,7 +395,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-Player::Player(const int id, const int handBegin, Bag& letterBag) {
+Player::Player(const int id, const int handBegin, Bag letterBag) {
     bool isValid = false;
     string name;
     do {
@@ -430,24 +431,25 @@ string Player::getName() const {
     return name_;
 }
 
+Hand Player::getHand() const {
+    return hand_;
+}
+
 //--------------------------------------------------------------------------------
 // PLAY LETTERS
 
-void Player::play(Board& b, Bag& letterBag) {
-    hand_.showHand();
-    if (hand_.checkIfCanPlay(b, letterBag)) {
+void Player::play(Board b, Bag letterBag) {
+    bool isValid = false;
+    string letter;
+    do {
+        hand_.showHand();
+        cout << "In which position do you want to play (Lc)? ";
+        getline(cin, letter);
 
-        bool isValid = false;
-        string letter;
-        do {
-            hand_.showHand();
-            cout << "In which position do you want to play (Lc)? ";
-            getline(cin, letter);
-
-        } while (!isValid);
-    }
-
+    } while (!isValid);
 }
+
+
 
 //--------------------------------------------------------------------------------
 // SHOW
@@ -468,7 +470,7 @@ void Player::showPlayer() const {
 class ListPlayer
 {
 public:
-    ListPlayer(int handBegin, Bag& letterBag);
+    ListPlayer(int handBegin, Bag letterBag);
     vector<Player> getListPlayers() const;
     void showPlayers() const;
 private:
@@ -478,7 +480,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-ListPlayer::ListPlayer(int handBegin, Bag& letterBag) {
+ListPlayer::ListPlayer(int handBegin, Bag letterBag) {
     bool isValid = false;
     int num;
     do {
@@ -580,13 +582,13 @@ int main() {
 
     while (!b.getEnd()) {
         for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
-            listPlayer.getListPlayers().at(i).play(b, letterBag);
+            listPlayer.getListPlayers().at(i).getHand().showHand();
+            if (listPlayer.getListPlayers().at(i).getHand().checkIfCanPlay(b, letterBag)) {
+                listPlayer.getListPlayers().at(i).play(b, letterBag);
+            }
             if (!b.getEnd())
                 break;
         }
-        int i;
-        cin >> i;
-
     }
 
     return 0;
