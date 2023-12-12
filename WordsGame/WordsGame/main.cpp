@@ -410,7 +410,7 @@ bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
         // It will find the last letters from the bag and replace them with the letters in the hand selected in lettersSelected
 
         cout << BLUE << "Your hand as changed!" << endl;
-        showHand;
+        showHand();
         return true;
     }
     else {
@@ -420,7 +420,6 @@ bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
     }
     
 }
-
 
 //--------------------------------------------------------------------------------
 // CHECK IF THERE IS A VALID MOVE
