@@ -616,7 +616,6 @@ void Player::play(Board& b, Bag& letterBag) {
                         // Convert the character to lowercase for columns (a, b, c, ...)
                         char col = tolower(position[1]);
                         if (b.isValidPosition(row, col)) {
-                            // Your logic for placing the letter on the board goes here...
                             isValidPosition = true;
                         }
                         else {
