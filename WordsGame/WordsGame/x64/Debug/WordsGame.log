@@ -1,4 +1,3 @@
 ﻿  main.cpp
 C:\Users\babam\OneDrive\Ambiente de Trabalho\Mestrado - 2ºAno - 1ºSemestre (2023.2024)\EDA\Project\WordsGame\WordsGame\WordsGame\main.cpp(458): warning C4715: 'Hand::checkIfCanPlay': nem todos os caminhos de controle retornam um valor
-  LINK : C:\Users\babam\OneDrive\Ambiente de Trabalho\Mestrado - 2ºAno - 1ºSemestre (2023.2024)\EDA\Project\WordsGame\WordsGame\x64\Debug\WordsGame.exe não encontrado ou não compilado pelo o último link incremental; executando link completo
   WordsGame.vcxproj -> C:\Users\babam\OneDrive\Ambiente de Trabalho\Mestrado - 2ºAno - 1ºSemestre (2023.2024)\EDA\Project\WordsGame\WordsGame\x64\Debug\WordsGame.exe
