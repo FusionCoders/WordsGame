@@ -68,9 +68,9 @@ Board::Board(const string& filename) {
     int numLins, numCols;
     iss >> dummy >> dummy >> dummy >> numLins >> dummy >> numCols; // read values from 'boardSize' and store integers 'numLins' and 'numCols' 
     b = vector<vector<pair<char, bool>>>(numLins, vector<pair<char, bool>>(numCols, make_pair(' ', false))); // create a bidimensional matrix 'b' 
-    // with dimensions 'numLins' by 'numCols';
-    // initialize each element as a pair<char, bool> 
-    // with a space character (' ') and false
+                                                                                        // with dimensions 'numLins' by 'numCols';
+                                                                                        // initialize each element as a pair<char, bool> 
+                                                                                        // with a space character (' ') and false
 // jump to line 5 (where the board starts)
     for (int i = 0; i < 4; ++i)
         getline(f, dummy);
@@ -135,7 +135,7 @@ vector<char> Board::getPlayableLetters() const {
                     else {
                         if ((isalpha(b.at(i - 1).at(j).first) == 0 && isalpha(b.at(i + 1).at(j).first) == 0))
                             playable = false; // letter has nothing before and after in the column
-                    }
+                    }                                                                   
                     if (playable) {
                         for (int p = i; p > 0; p--) { // scroll up through the column
                             if (isalpha(b.at(i - (i - p) - 1).at(j).first)) { // true if it is a letter
@@ -292,7 +292,7 @@ class Hand
 public:
     Hand();
     Hand(vector<char> playerHand);
-    Hand(int handBegin, Bag& letterBag);
+    Hand(int nLetters, Bag& letterBag);
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char>& playableLetters);
     vector<char> readLetterToChange(int i);
@@ -309,8 +309,8 @@ Hand::Hand() {
     // nothing to do here, the vector<char> playerHand will be created empty automatically
 }
 
-Hand::Hand(int handBegin, Bag& letterBag) {
-    for (int i = 0; i < handBegin; i++) {
+Hand::Hand(int nLetters, Bag& letterBag) {
+    for (int i = 0; i < nLetters; i++) {
         char randomLetter = letterBag.getLetters().at(i);
         playerHand.push_back(randomLetter);
         letterBag.deleteLetters(i);
@@ -339,12 +339,12 @@ bool Hand::validMoveExist(vector<char>& playableLetters) {
 // CHANGE LETTERS BETWEEN HAND AND BAG
 
 bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
-    // Order the vectors, as includes requires that the ranges are ordered
+    // order the vectors, as includes requires that the ranges are ordered
     sort(lettersSelected.begin(), lettersSelected.end());
     sort(playerHand.begin(), playerHand.end());
-    // Check if all elements of lettersSelected are contained in playerHand
+    // check if all elements of lettersSelected are contained in playerHand
     if (includes(playerHand.begin(), playerHand.end(), lettersSelected.begin(), lettersSelected.end())) {
-        // It will find the first letters from the bag and replace them with the letters in the hand selected in lettersSelected
+        // it will find the first letters from the bag and replace them with the letters in the hand selected in lettersSelected
         for (int t = 0; t < lettersSelected.size(); t++) {
             for (char& ch : playerHand) {
                 if (ch == lettersSelected.at(t)) {
@@ -353,7 +353,7 @@ bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
                     ch = newBag.at(t);
                     newBag.at(t) = old;
                     letterbag.setLetters(newBag); //DEVIA-SE FAZER NO FIM DE TUDO
-                    break;  // Stop after first substitution;
+                    break;  // stop after first substitution;
                 }
             }
         }
@@ -374,9 +374,9 @@ bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
 vector<char> Hand::readLetterToChange(int i) {
     string input;
     do {
-        if (i == 0) // Can only change one letter;
+        if (i == 0) // can only change one letter;
             cout << "Which hand letter do you want to change (QUIT/PASS)? " << endl;
-        else // Can change one or two letters;
+        else // can change one or two letters;
             cout << "Which hand letter/s do you want to change (QUIT/PASS)? " << endl;
         if (getline(cin, input)) {
             if (input == "QUIT" || input == "PASS") { // check if the person wants to quit or pass
@@ -417,7 +417,7 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
         int aux = 0;
         if (letterbag.getLetters().size() == 0) { // true if the bag is empty
             cout << BLUE << "The bag is empty, you cannot change letters, your turn has passed!" << endl << NO_COLOR;
-            return make_pair(playerHand, false); // the player is not gonna play
+            return make_pair(playerHand, false); // the player is not going to play
         }
         else if (letterbag.getLetters().size() == 1 || playerHand.size() == 1) { // true if the bag has only 1 letter
             cout << BLUE << "You can only exchange one letter from your hand with the bag!" << endl << NO_COLOR;
@@ -451,7 +451,7 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
             }
             else {
                 cout << BLUE << "Still have no play options!" << endl << NO_COLOR;
-                return make_pair(playerHand, false); // the player is not gonna play
+                return make_pair(playerHand, false); // the player is not going to play
             }
         }
     }
@@ -476,7 +476,7 @@ class Player
 {
 public:
     Player(int id, int points, string name, Hand hand);
-    Player(int id, int handBegin, Bag& letterBag);
+    Player(int id, int nLetters, Bag& letterBag);
     int getId() const;
     int getPoints() const;
     string getName() const;
@@ -493,7 +493,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-Player::Player(const int id, const int handBegin, Bag& letterBag) {
+Player::Player(const int id, const int nLetters, Bag& letterBag) {
     bool isValid = false;
     string name;
     do {
@@ -504,7 +504,7 @@ Player::Player(const int id, const int handBegin, Bag& letterBag) {
                 id_ = id;
                 points_ = 0;
                 name_ = name;
-                Hand hand(handBegin, letterBag);
+                Hand hand(nLetters, letterBag);
                 hand_ = hand;
             }
         }
@@ -551,6 +551,16 @@ void Player::play(Board& b, Bag& letterBag) {
     bool isValid = false;
     string letter;
     do {
+        cout << "Which letter do you want to play (QUIT/PASS)? ";
+        if (getline(cin, letter)) {
+            if (letter == "QUIT") {
+
+            } else if (letter == "PASS") {
+                cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
+                break;
+                
+            }
+        }
         cout << "In which position do you want to play (Lc)? ";
         getline(cin, letter);
         isValid = true; // só para testar outras funções;
@@ -579,7 +589,7 @@ void Player::showPlayer() const {
 class ListPlayer
 {
 public:
-    ListPlayer(int handBegin, Bag& letterBag);
+    ListPlayer(int nLetters, Bag& letterBag);
     vector<Player> getListPlayers() const;
     void setPlayer(int i, Player player);
     void showPlayers() const;
@@ -590,7 +600,7 @@ private:
 //--------------------------------------------------------------------------------
 // CONSTRUCTORS
 
-ListPlayer::ListPlayer(int handBegin, Bag& letterBag) {
+ListPlayer::ListPlayer(int nLetters, Bag& letterBag) {
     bool isValid = false;
     int num;
     do {
@@ -612,7 +622,7 @@ ListPlayer::ListPlayer(int handBegin, Bag& letterBag) {
     } while (!isValid);
 
     for (int i = 1; i <= num; i++) {
-        Player p(i, handBegin, letterBag);
+        Player p(i, nLetters, letterBag);
         playersList.push_back(p);
     }
     cout << endl;
@@ -647,12 +657,12 @@ void ListPlayer::showPlayers() const {
 //================================================================================
 
 // Read the number of letters initially taken by each player
-void readHandBegin(int& handBegin, Bag& letterBag) {
+void readNLetters(int& nLetters, Bag& letterBag) {
     bool isValid = false;
     do {
         cout << "How many letters should be initially taken by each player? ";
-        if (cin >> handBegin) {
-            if (handBegin <= (letterBag.getLetters().size() / 4)) {
+        if (cin >> nLetters) {
+            if (nLetters <= (letterBag.getLetters().size() / 4)) {
                 isValid = true;
                 // clean input buffer
                 cin.ignore(1000, '\n');
@@ -687,10 +697,10 @@ int main() {
     Bag letterBag(b);
     letterBag.showLetters();
 
-    int handBegin;
-    readHandBegin(handBegin, letterBag);
+    int nLetters;
+    readNLetters(nLetters, letterBag);
 
-    ListPlayer listPlayer(handBegin, letterBag);
+    ListPlayer listPlayer(nLetters, letterBag);
     listPlayer.showPlayers();
 
 
@@ -705,7 +715,7 @@ int main() {
             Player player(listPlayer.getListPlayers().at(i).getId(), listPlayer.getListPlayers().at(i).getPoints(), listPlayer.getListPlayers().at(i).getName(), hand);
             listPlayer.setPlayer(i, player);
 
-            if (inf.second) {
+            if (inf.second) { // if the player has valid moves
                 listPlayer.getListPlayers().at(i).play(b, letterBag);
             }
             if (b.getEnd())
