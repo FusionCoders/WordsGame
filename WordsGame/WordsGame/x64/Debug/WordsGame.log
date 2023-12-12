@@ -1,12 +1,3 @@
 ﻿  main.cpp
-<<<<<<< HEAD
 C:\Users\Diogo Bastos\Desktop\Mestrado\2º ano\1ºSemestre\EDA - Estruturas de Dados e Algoritmos\WordsGame\WordsGame\WordsGame\main.cpp(460): warning C4715: 'Hand::checkIfCanPlay': nem todos os caminhos de controle retornam um valor
-=======
-<<<<<<< HEAD
-C:\Users\babam\OneDrive\Ambiente de Trabalho\Mestrado - 2ºAno - 1ºSemestre (2023.2024)\EDA\Project\WordsGame\WordsGame\WordsGame\main.cpp(343): warning C4715: 'Hand::checkIfCanPlay': nem todos os caminhos de controle retornam um valor
-  WordsGame.vcxproj -> C:\Users\babam\OneDrive\Ambiente de Trabalho\Mestrado - 2ºAno - 1ºSemestre (2023.2024)\EDA\Project\WordsGame\WordsGame\x64\Debug\WordsGame.exe
-=======
-C:\Users\Diogo Bastos\Desktop\Mestrado\2º ano\1ºSemestre\EDA - Estruturas de Dados e Algoritmos\WordsGame\WordsGame\WordsGame\main.cpp(365): warning C4715: 'Hand::checkIfCanPlay': nem todos os caminhos de controle retornam um valor
->>>>>>> 84164095c48010299dff53eead8cd9c7ba74cee0
   WordsGame.vcxproj -> C:\Users\Diogo Bastos\Desktop\Mestrado\2º ano\1ºSemestre\EDA - Estruturas de Dados e Algoritmos\WordsGame\WordsGame\x64\Debug\WordsGame.exe
->>>>>>> c974c1ccb79dcb82baa337b3b2b4213cb2ef1674

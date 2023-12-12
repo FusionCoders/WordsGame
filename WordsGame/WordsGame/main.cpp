@@ -362,7 +362,6 @@ bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
         return true;
     }
     else {
-        cout << "ta tudo" << endl;
         cout << RED << "You can only select letters that are present in your hand!" << endl << NO_COLOR;
         showHand();
         return false;
@@ -444,9 +443,8 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
                     cout << BLUE << "You quit the game!" << endl << NO_COLOR;
                     return make_pair(playerHand, false);
                 }
-                else {
+                else 
                     isValid = changeHand(selectedLetters, letterbag); // do the substitution and it returns true if the substitution was completed correctely            
-                }
             } while (!isValid);
             if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
                 return make_pair(playerHand, true);
