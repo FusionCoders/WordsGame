@@ -293,6 +293,7 @@ public:
     Hand();
     Hand(vector<char> playerHand);
     Hand(int handBegin, Bag& letterBag);
+    vector<char> getPlayerHand() const;
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char>& playableLetters);
     vector<char> readLetterToChange(int i);
@@ -401,6 +402,13 @@ vector<char> Hand::readLetterToChange(int i) {
             }
         }
     } while (true);
+}
+
+//--------------------------------------------------------------------------------
+// GET PLAYER HAND
+
+vector<char> Hand::getPlayerHand() const {
+    return playerHand;
 }
 
 //--------------------------------------------------------------------------------
