@@ -296,8 +296,8 @@ public:
     vector<char> getHandLetters();
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char>& playableLetters);
-    vector<char> readLetterToChange(int i);
-    bool changeHand(vector<char>& lettersSelected, Bag& letterbag);
+    string readLetterToChange(int i);
+    bool changeHand(string& lettersSelected, Bag& letterbag);
     void showHand() const;
 private:
     vector<char> playerHand;
@@ -346,16 +346,21 @@ bool Hand::validMoveExist(vector<char>& playableLetters) {
 //--------------------------------------------------------------------------------
 // CHANGE LETTERS BETWEEN HAND AND BAG
 
-bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
+bool Hand::changeHand(string& lettersSelected, Bag& letterbag) {
+    vector <char> lettersSelectedVet;
+    if (lettersSelected.size() == 1) //convert string to vector of chars
+        lettersSelectedVet = { lettersSelected[0] };
+    else
+        lettersSelectedVet = { lettersSelected[0], lettersSelected[2] };
     // order the vectors, as includes requires that the ranges are ordered
-    sort(lettersSelected.begin(), lettersSelected.end());
+    sort(lettersSelectedVet.begin(), lettersSelectedVet.end());
     sort(playerHand.begin(), playerHand.end());
     // check if all elements of lettersSelected are contained in playerHand
-    if (includes(playerHand.begin(), playerHand.end(), lettersSelected.begin(), lettersSelected.end())) {
+    if (includes(playerHand.begin(), playerHand.end(), lettersSelectedVet.begin(), lettersSelectedVet.end())) {
         // it will find the first letters from the bag and replace them with the letters in the hand selected in lettersSelected
-        for (int t = 0; t < lettersSelected.size(); t++) {
+        for (int t = 0; t < lettersSelectedVet.size(); t++) {
             for (char& ch : playerHand) {
-                if (ch == lettersSelected.at(t)) {
+                if (ch == lettersSelectedVet.at(t)) {
                     char old = ch;
                     vector<char> newBag = letterbag.getLetters();
                     ch = newBag.at(t);
@@ -379,7 +384,7 @@ bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
 //--------------------------------------------------------------------------------
 // READ LETTERS FROM HAND TO CHANGE
 
-vector<char> Hand::readLetterToChange(int i) {
+string Hand::readLetterToChange(int i) {
     string input;
     do {
         if (i == 0) // can only change one letter;
@@ -388,21 +393,18 @@ vector<char> Hand::readLetterToChange(int i) {
             cout << "Which hand letter/s do you want to change (QUIT/PASS)? " << endl;
         if (getline(cin, input)) {
             if (input == "QUIT" || input == "PASS") { // check if the person wants to quit or pass
-                return { input[0], input[1], input[2], input[3] };
+                return input;
             }
             else {
                 if (i == 0) { // to the case where there is only one letter in the bag
                     if (input.size() == 1)
-                        return { input[0] };
+                        return input;
                     else
                         cout << RED << "You can only choose one letter from your hand! " << endl << NO_COLOR;
                 }
                 else { // to the case where there is two or more letters in the bag
-                    if (input.size() == 1) { // if input is only one letter
-                        return { input[0] };
-                    }
-                    else if (input.size() == 3 && input[1] == ' ') // if input is two letters separeted bu a space
-                        return { input[0], input[2] };
+                    if ((input.size() == 3 && input[1] == ' ') || input.size() == 1) // if input is two letters separeted by a space or input is only one letter
+                        return input;
                     else
                         cout << RED << "You can only choose one or two letter from your hand separated by space! " << endl << NO_COLOR;
                 }
@@ -421,7 +423,7 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
     }
     else { // if there is no valid moves it asks for substitutions in the hand                                              
         cout << BLUE << "You have no play options!" << endl << NO_COLOR;
-        vector<char> selectedLetters;
+        string selectedLetters;
         int aux = 0;
         if (letterbag.getLetters().size() == 0) { // true if the bag is empty
             cout << BLUE << "The bag is empty, you cannot change letters, your turn has passed!" << endl << NO_COLOR;
@@ -442,11 +444,11 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
                     selectedLetters = readLetterToChange(0); // can return one letter or QUIT or PASS
                 else
                     selectedLetters = readLetterToChange(1); // can return one or two letters or QUIT or PASS
-                if (equal(selectedLetters.begin(), selectedLetters.end(), begin({ 'P', 'A', 'S', 'S' })) && selectedLetters.size() == 4) {
+                if (selectedLetters == "PASS") {
                     cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
                     return make_pair(playerHand, false);
                 }
-                else if (equal(selectedLetters.begin(), selectedLetters.end(), begin({ 'Q', 'U', 'I', 'T' })) && selectedLetters.size() == 4) {
+                else if (selectedLetters == "QUIT") {
                     throw "You quit the game!";
                 }
                 else
@@ -747,16 +749,17 @@ int main() {
                     listPlayer.getListPlayers().at(i).play(b, letterBag);
                 }
             }
-            catch(string message){
+            catch(const char* message){
                 cout << BLUE << message << endl << NO_COLOR;
                 listPlayer.deletePlayer(i);
                 i--; // Decrease i to correct iteration after player removal
             }
-            if (b.getEnd() || listPlayer.getListPlayers().size() == 1) // it ends if you reach the end of the board or if there is only one player left
+            if (b.getEnd() || listPlayer.getListPlayers().size() == 1) { // it ends if you reach the end of the board or if there is only one player left
                 break;
+            }
         }
     }
-
+    cout << GREEN << "END OF THE GAME" << endl << NO_COLOR;
 
     return 0;
 }
