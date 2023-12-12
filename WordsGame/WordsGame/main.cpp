@@ -293,6 +293,7 @@ public:
     Hand();
     Hand(vector<char> playerHand);
     Hand(int nLetters, Bag& letterBag);
+    vector<char> getHandLetters();
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char>& playableLetters);
     vector<char> readLetterToChange(int i);
@@ -319,6 +320,13 @@ Hand::Hand(int nLetters, Bag& letterBag) {
 
 Hand::Hand(vector<char> playerHand) {
     this->playerHand = playerHand;
+}
+
+//--------------------------------------------------------------------------------
+// GETS AND SETS
+
+vector<char> Hand::getHandLetters() {
+    return playerHand;
 }
 
 //--------------------------------------------------------------------------------
@@ -548,24 +556,38 @@ Hand Player::getHand() const {
 // PLAY LETTERS
 
 void Player::play(Board& b, Bag& letterBag) {
-    bool isValid = false;
+    bool isValidLetter = false;
     string letter;
     do {
         cout << "Which letter do you want to play (QUIT/PASS)? ";
         if (getline(cin, letter)) {
             if (letter == "QUIT") {
-
+                // DIOGO VAI CRIAR FUNÇÃO DE ELIMINAR PLAYER
+                break;
             } else if (letter == "PASS") {
                 cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
                 break;
-                
+            }
+            else if (letter.size() == 1) {
+                bool isValidPosition = false;
+                do {
+                    if (includes(hand_.getHandLetters().begin(), hand_.getHandLetters().end(), b.getPlayableLetters().begin(), b.getPlayableLetters().end())) {
+                        cout << "In which position do you want to play (Lc)? ";
+                    }
+                    else {
+                        cout << RED << "The letter does not fit in any position!" << NO_COLOR << endl;
+                    }
+                } while (!isValidPosition);
+            }
+            else {
+                cout << RED << "Invalid input!" << NO_COLOR << endl;
             }
         }
         cout << "In which position do you want to play (Lc)? ";
         getline(cin, letter);
-        isValid = true; // só para testar outras funções;
+        isValidLetter = true; // só para testar outras funções;
 
-    } while (!isValid);
+    } while (!isValidLetter);
 }
 
 
