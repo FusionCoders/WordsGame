@@ -447,9 +447,7 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
                     return make_pair(playerHand, false);
                 }
                 else if (equal(selectedLetters.begin(), selectedLetters.end(), begin({ 'Q', 'U', 'I', 'T' })) && selectedLetters.size() == 4) {
-                    //deletePlayer(); // it returns true if the player was deleted correctely
-                    cout << BLUE << "You quit the game!" << endl << NO_COLOR;
-                    return make_pair(playerHand, false);
+                    throw "You quit the game!";
                 }
                 else
                     isValid = changeHand(selectedLetters, letterbag); // do the substitution and it returns true if the substitution was completed correctely            
@@ -614,6 +612,7 @@ public:
     ListPlayer(int nLetters, Bag& letterBag);
     vector<Player> getListPlayers() const;
     void setPlayer(int i, Player player);
+    void deletePlayer(int i);
     void showPlayers() const;
 private:
     vector<Player> playersList;
@@ -659,6 +658,13 @@ vector <Player> ListPlayer::getListPlayers() const {
 
 void ListPlayer::setPlayer(int i, Player player) {
     playersList.at(i) = player;
+}
+
+//--------------------------------------------------------------------------------
+// DELETE PLAYER FROM THE GAME
+
+void ListPlayer::deletePlayer(int i) {
+    playersList.erase(playersList.begin() + i);
 }
 
 //--------------------------------------------------------------------------------
@@ -726,21 +732,27 @@ int main() {
     listPlayer.showPlayers();
 
 
-    while (!b.getEnd()) {
+    while (!b.getEnd() && listPlayer.getListPlayers().size() != 1) {
         cout << BLUE << "--------------------------------------NEW ROUND----------------------------------" << endl << NO_COLOR;
         for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
             cout << BLUE << "---------------------------------------PLAYER " << listPlayer.getListPlayers().at(i).getId() << "----------------------------------" << endl << NO_COLOR;
             listPlayer.getListPlayers().at(i).getHand().showHand();
+            try {
+                pair<vector<char>, bool> inf = listPlayer.getListPlayers().at(i).getHand().checkIfCanPlay(b, letterBag);
+                Hand hand(inf.first);
+                Player player(listPlayer.getListPlayers().at(i).getId(), listPlayer.getListPlayers().at(i).getPoints(), listPlayer.getListPlayers().at(i).getName(), hand);
+                listPlayer.setPlayer(i, player);
 
-            pair<vector<char>, bool> inf = listPlayer.getListPlayers().at(i).getHand().checkIfCanPlay(b, letterBag);
-            Hand hand(inf.first);
-            Player player(listPlayer.getListPlayers().at(i).getId(), listPlayer.getListPlayers().at(i).getPoints(), listPlayer.getListPlayers().at(i).getName(), hand);
-            listPlayer.setPlayer(i, player);
-
-            if (inf.second) { // if the player has valid moves
-                listPlayer.getListPlayers().at(i).play(b, letterBag);
+                if (inf.second) { // if the player has valid moves
+                    listPlayer.getListPlayers().at(i).play(b, letterBag);
+                }
             }
-            if (b.getEnd())
+            catch(string message){
+                cout << BLUE << message << endl << NO_COLOR;
+                listPlayer.deletePlayer(i);
+                i--; // Decrease i to correct iteration after player removal
+            }
+            if (b.getEnd() || listPlayer.getListPlayers().size() == 1) // it ends if you reach the end of the board or if there is only one player left
                 break;
         }
     }
