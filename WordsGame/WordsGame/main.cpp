@@ -551,10 +551,9 @@ void Player::play(Board& b, Bag& letterBag) {
     bool isValid = false;
     string letter;
     do {
-        hand_.showHand();
         cout << "In which position do you want to play (Lc)? ";
         getline(cin, letter);
-        isValid = true;
+        isValid = true; // só para testar outras funções;
 
     } while (!isValid);
 }
