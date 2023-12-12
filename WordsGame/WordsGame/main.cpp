@@ -627,14 +627,26 @@ Hand Player::getHand() const {
 // PLAY LETTERS
 
 void Player::play(Board& b, Bag& letterBag) {
-    bool isValid = false;
-    string letter;
-    do {
-        cout << "In which position do you want to play (Lc)? ";
-        getline(cin, letter);
-        isValid = true; // só para testar outras funções;
+    bool isValidLetter = false;
+    string selectedletter;
 
-    } while (!isValid);
+    do {
+        cout << "Your hand: ";
+        hand_.showHand();
+        cout << endl;
+        cout << "Choose a letter from your hand: ";
+        cin >> selectedletter;
+
+        vector<char> playerHand = hand_.getPlayerHand();
+        if (find(playerHand.begin(), playerHand.end(), selectedletter[0]) != playerHand.end()) {
+            isValidLetter = true;
+            cout << "Valid selection. You chose: " << selectedletter << endl;
+        }
+        else {
+            cout << "Invalid selection. Please choose a letter from your hand." << endl;
+        }
+    } while (!isValidLetter);
+
 }
 
 
