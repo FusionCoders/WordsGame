@@ -293,6 +293,7 @@ public:
     Hand();
     Hand(vector<char> playerHand);
     Hand(int handBegin, Bag& letterBag);
+    vector<char> getPlayerHand() const;
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<char>& playableLetters);
     vector<char> readLetterToChange(int i);
@@ -404,6 +405,13 @@ vector<char> Hand::readLetterToChange(int i) {
 }
 
 //--------------------------------------------------------------------------------
+// GET PLAYER HAND
+
+vector<char> Hand::getPlayerHand() const {
+    return playerHand;
+}
+
+//--------------------------------------------------------------------------------
 // CHECK IF CAN PLAY
 
 pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
@@ -455,6 +463,77 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
             } 
         }
     }
+}
+
+//--------------------------------------------------------------------------------
+// READ LETTERS FROM HAND TO CHANGE
+
+vector<char> Hand::readLetterToChange(int i) {
+    string input;
+    do {
+        if(i == 0) // Can only change one letter;
+            cout << "Which hand letter do you want to change (QUIT/PASS)? " << endl;
+        else // Can change one or two letters;
+            cout << "Which hand letter/s do you want to change (QUIT/PASS)? " << endl;
+        if (getline(cin, input)) {
+            if (input == "QUIT" || input == "PASS") { // check if the person wants to quit or pass
+                return { input[0], input[1], input[2], input[3] };
+            }
+            else {
+                if (i == 0) { // to the case where there is only one letter in the bag
+                    if (input.size() == 1)
+                        return { input[0] };
+                    else
+                        cout << RED << "You can only choose one letter from your hand! " << endl << NO_COLOR;
+                }
+                else { // to the case where there is two or more letters in the bag
+                    if (input.size() == 1) // if input is only one letter
+                        return { input[0] };
+                    else if (input.size() == 3 && input[1] == ' ') // if input is two letters separeted bu a space
+                        return { input[0], input[2] };
+                    else
+                        cout << RED << "You can only choose one or two letter from your hand separated by space! " << endl << NO_COLOR;
+                }
+            }                
+        }
+    } while (true);
+}
+
+//--------------------------------------------------------------------------------
+// CHANGE LETTERS BETWEEN HAND AND BAG
+
+bool Hand::changeHand(vector<char>& lettersSelected, Bag& letterbag) {
+    // Order the vectors, as includes requires that the ranges are ordered
+    sort(lettersSelected.begin(), lettersSelected.end());
+    sort(playerHand.begin(), playerHand.end());
+    // Check if all elements of lettersSelected are contained in playerHand
+    if (includes(playerHand.begin(), playerHand.end(), lettersSelected.begin(), lettersSelected.end())) {
+        // It will find the last letters from the bag and replace them with the letters in the hand selected in lettersSelected
+
+        cout << BLUE << "Your hand as changed!" << endl;
+        showHand();
+        return true;
+    }
+    else {
+        cout << RED << "You can only select letters that are present in your hand!" << endl << NO_COLOR;
+        showHand();
+        return false;
+    }
+    
+}
+
+//--------------------------------------------------------------------------------
+// CHECK IF THERE IS A VALID MOVE
+
+bool Hand::validMoveExist(vector<char>& playableLetters) {
+    for (char ch1 : playableLetters) {
+        for (char ch2 : playerHand) {
+            if (ch1 == ch2) {
+                return true; // common character found between the player's hand and the playable letters on the board
+            }
+        }
+    }
+    return false;
 }
 
 //--------------------------------------------------------------------------------
@@ -548,14 +627,26 @@ Hand Player::getHand() const {
 // PLAY LETTERS
 
 void Player::play(Board& b, Bag& letterBag) {
-    bool isValid = false;
-    string letter;
-    do {
-        cout << "In which position do you want to play (Lc)? ";
-        getline(cin, letter);
-        isValid = true; // só para testar outras funções;
+    bool isValidLetter = false;
+    string selectedletter;
 
-    } while (!isValid);
+    do {
+        cout << "Your hand: ";
+        hand_.showHand();
+        cout << endl;
+        cout << "Choose a letter from your hand: ";
+        cin >> selectedletter;
+
+        vector<char> playerHand = hand_.getPlayerHand();
+        if (find(playerHand.begin(), playerHand.end(), selectedletter[0]) != playerHand.end()) {
+            isValidLetter = true;
+            cout << "Valid selection. You chose: " << selectedletter << endl;
+        }
+        else {
+            cout << "Invalid selection. Please choose a letter from your hand." << endl;
+        }
+    } while (!isValidLetter);
+
 }
 
 
