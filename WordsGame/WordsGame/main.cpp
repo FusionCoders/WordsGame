@@ -46,8 +46,9 @@ public:
     Board(const string& filename); // constructor
     void show() const; // const method (NOTE: const methods cannot modify the attributes)
     vector<vector<pair<char, bool>>> getBoard() const;
-    vector<char> getPlayableLetters() const;
+    vector<pair<char, string>> getPlayableLetters() const;
     bool isValidPosition(char row, char col) const;
+    bool isValidInsertion(char row, char col, char letter, vector<char> playablePositions) const;
     bool getEnd() const;
 private:
     vector<vector<pair<char, bool>>> b; //False --> letter not covered / True --> letter covered
@@ -115,7 +116,7 @@ bool Board::getEnd() const {
 }
 
 //--------------------------------------------------------------------------------
-//VALIDATION OF POSITION ON BOARD
+// VALIDATE THE POSITION ON BOARD
 
 bool Board::isValidPosition(char row, char col) const {
     char maxRow = 'A' + static_cast<char>(b.size()) - 1;
@@ -124,12 +125,24 @@ bool Board::isValidPosition(char row, char col) const {
     return (row >= 'A' && row <= maxRow && col >= 'a' && col <= maxCol);
 }
 
+//--------------------------------------------------------------------------------
+// VALIDATE IF LETTER FITS IN A CELL ON BOARD
+
+//bool Board::isValidInsertion(char row, char col, char letter, vector<char> playablePositions) const {
+//    if (letter == b.at(i).at(j).first) {
+//
+//    }
+//    char maxCol = 'a' + static_cast<char>(b.at(0).size()) - 1;
+//
+//    return ;
+//}
 
 //--------------------------------------------------------------------------------
-// GET A VECTOR WITH ALL LETTERS IN PLAYABLE POSITIONS
+// GET A VECTOR WITH ALL LETTERS IN PLAYABLE POSITIONS AND RESPECTIVE POSITIONS
 
-vector<char> Board::getPlayableLetters() const {
-    vector<char> playableLetters;
+vector<pair<char, string>> Board::getPlayableLetters() const {
+    vector<pair<char, string>> playableLetters;
+    //vector<pair<int, int>> playablePositions;
     bool playable;
     for (int i = 0; i < b.at(0).size(); i++) { // scroll through each line
         for (int j = 0; j < b.at(1).size(); j++) { // scroll through each column
@@ -161,7 +174,7 @@ vector<char> Board::getPlayableLetters() const {
                         }
                     }
                     if (playable) {
-                        playableLetters.push_back(b.at(i).at(j).first); // add letter to the vector   
+                        playableLetters.push_back(make_pair(b.at(i).at(j).first, (to_string(i) + to_string(j)))); // add letter and position to the vector   
                     }
                     else { // is gonna check in the line if is valid
                         playable = true; // playable until proven otherwise
@@ -191,7 +204,7 @@ vector<char> Board::getPlayableLetters() const {
                             }
                         }
                         if (playable) {
-                            playableLetters.push_back(b.at(i).at(j).first); // add letter to the vector   
+                            playableLetters.push_back(make_pair(b.at(i).at(j).first, (to_string(i) + to_string(j)))); // add letter and position to the vector   
                         }
                     }
                 }
@@ -307,7 +320,7 @@ public:
     Hand(int nLetters, Bag& letterBag);
     vector<char> getHandLetters();
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
-    bool validMoveExist(vector<char>& playableLetters);
+    bool validMoveExist(vector<pair<char, string>>& playableLetters);
     string readLetterToChange(int i);
     bool changeHand(string& lettersSelected, Bag& letterbag);
     void showHand() const;
@@ -344,10 +357,10 @@ vector<char> Hand::getHandLetters() {
 //--------------------------------------------------------------------------------
 // CHECK IF THERE IS A VALID MOVE
 
-bool Hand::validMoveExist(vector<char>& playableLetters) {
-    for (char ch1 : playableLetters) {
+bool Hand::validMoveExist(vector<pair<char,string>>& playableLetters) {
+    for (int i = 0; i < playableLetters.size(); i++) {
         for (char ch2 : playerHand) {
-            if (ch1 == ch2) {
+            if (playableLetters.at(i).first == ch2) {
                 return true; // common character found between the player's hand and the playable letters on the board
             }
         }
@@ -429,7 +442,7 @@ string Hand::readLetterToChange(int i) {
 // CHECK IF CAN PLAY
 
 pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
-    vector<char> playableLetters = b.getPlayableLetters();
+    vector<pair<char,string>> playableLetters = b.getPlayableLetters();
     if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
         return make_pair(playerHand, true);
     }
@@ -568,71 +581,78 @@ Hand Player::getHand() const {
 // PLAY LETTERS
 
 void Player::play(Board& b, Bag& letterBag) {
-    bool isValid = false;
-    string letter;
+    bool isValidLetter = false;
+    string letterInput;
     do {
-        cout << "Which letter do you want to play (QUIT/PASS)? ";
-        if (getline(cin, letter)) {
-            if (letter == "QUIT") {
-                // DIOGO VAI CRIAR FUNÇÃO DE ELIMINAR PLAYER
-                break;
+        cout << "Letter (QUIT/PASS)? ";
+        if (getline(cin, letterInput)) {
+            if (letterInput == "QUIT") {
+                throw "You quit the game!";
             }
-            else if (letter == "PASS") {
+            else if (letterInput == "PASS") {
                 cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
                 break;
             }
-
-            else if (letter.size() == 1) {
-                bool isValidLetter = false;
-                do {
-                    if (letter.size() == 1)
-                    {
-                        vector<char> playerHand = hand_.getHandLetters();
-                        if (find(playerHand.begin(), playerHand.end(), letter[0]) != playerHand.end()) {
-                            isValidLetter = true;
-                        }
-                        else {
-                            cout << RED << "Invalid selection. Please choose a letter from your hand: " << NO_COLOR;
-                            getline(cin, letter);
-                        }
-
-
-                    }
-
-                } while (!isValidLetter);
-
-
-                bool isValidPosition = false;
-                do {
-                    cout << "In which position do you want to play (Lc)? ";
-                    string position;
-                    getline(cin, position);
-
-                    // Validate the position format (Lc)
-                    if (position.size() == 2 && isalpha(position[0]) && isalpha(position[1])) {
-                        // Convert the character to uppercase for rows (A, B, C, ...)
-                        char row = toupper(position[0]);
-
-                        // Convert the character to lowercase for columns (a, b, c, ...)
-                        char col = tolower(position[1]);
-                        if (b.isValidPosition(row, col)) {
-                            isValidPosition = true;
-                        }
-                        else {
-                            cout << RED << "The letter does not fit in any position!" << NO_COLOR << endl;
-                        }
-                    }
-                    else {
-                        cout << RED << "Invalid input format. Please enter a valid position in the format (Lc)." << NO_COLOR << endl;
-                    }
-                } while (!isValidPosition);
-                isValid = true;
+            else if (letterInput.size() == 1) {
+                vector<char> playerHand = hand_.getHandLetters();
+                char letter = toupper(letterInput[0]);
+                if (find(playerHand.begin(), playerHand.end(), letter) != playerHand.end()) {
+                    /*vector<pair<char, string>> playableLet_Pos = b.getPlayableLetters();
+                    vector<char> playableLetters;
+                    vector<string> playablePositions;
+                    for (int i = 0; i < playableLet_Pos.size(); i++) {
+                        playableLetters.push_back(playableLet_Pos.at(i).first);
+                        playablePositions.push_back(playableLet_Pos.at(i).second);
+                    }*/
+                    //if (find(playableLetters.begin(), playableLetters.end(), letter) != playableLetters.end()) {
+                    //    //if (isValidInsertion(char row, char col, char letter, vector<char> playablePositions)) { // Verifify if the position is playable
+                    //    //                                                                                         // and the letter fits
+                    //      //  isValidLetter = true;
+                    //   // }
+                    //}
+                    //else {
+                    //    cout << RED << "The selected letter does not fit in any playbale position!" << endl << NO_COLOR;
+                    //}
+                }
+                else {
+                    cout << RED << "You can only select letters that are present in your hand!" << endl << NO_COLOR;
+                }
+            }
+            else {
+                cout << RED << "Invalid input!" << endl << NO_COLOR;
             }
         }
-    } while (!isValid);
+    } while (!isValidLetter);
+
+    bool isValidPosition = false;
+    string position;
+
+    do {
+        cout << "Position (Lc) (QUIT/PASS)? ";
+        if (getline(cin, position)) {
+            if (position == "QUIT") {
+                throw "You quit the game!";
+            }
+            else if (position == "PASS") {
+                cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
+                break;
+            }
+            else if (position.size() == 2 && isalpha(position[0]) && isupper(position[0]) && isalpha(position[1]) && islower(position[1])) {
+                if (b.isValidPosition(position[0], position[1])) {
+                    
+                    isValidPosition = true;
+                }
+                else {
+                    cout << RED << "Invalid postion! Please enter a position that exists on the board!" << endl << NO_COLOR;
+                }
+            }
+            else {
+                cout << RED << "Invalid input format. Please enter a valid position in the format (Lc) or QUIT/PASS." << endl << NO_COLOR;
+            }
+        }
+
+    } while (!isValidPosition);
 }
-
-
 
 //--------------------------------------------------------------------------------
 // SHOW
