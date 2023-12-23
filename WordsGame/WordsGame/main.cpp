@@ -516,6 +516,7 @@ public:
     Hand getHand() const;
     void play(Board& b, Bag& letterBag);
     void showPlayer() const;
+    void printWinner() const;
 private:
     int id_;
     int points_;
@@ -740,6 +741,47 @@ void ListPlayer::showPlayers() const {
         player.showPlayer();
     }
     cout << endl;
+}
+//---------------------------------------------------------------------------------
+//PRINT THE WINNER
+
+
+void printWinner(const vector<Player>& players) {
+    if (players.size() == 1) { //If there is only one player playing, this one is going to be the winner of the game
+        cout << "The winner is: " << GREEN << players[0].getName() << NO_COLOR << "!";
+        cout << endl;
+    }
+
+    else { //If there are more players playing... 
+        int maxPoints = 0;
+        vector<string> winners; //This is a list that will save the names of the winners
+
+        for (const auto& player : players) {
+            if (player.getPoints() > maxPoints) //If the number of points is greater than the "maxPoints", "maxPoints" its going to be updated with this new points, until it reaches the maximum
+            {
+                maxPoints = player.getPoints();
+                winners.push_back(player.getName()); //Gets the name of the player with this Maximum points.
+
+            }
+            else if (player.getPoints() == maxPoints) //If the players have the same points...
+            {
+                winners.push_back(player.getName()); //Their names are going to be saved on the winners list.
+            }
+        }
+        if (winners.size() == 1) //If the list of winners has only one name, this player is going to be the winnner
+        {
+            cout << "The winner is: " << GREEN << winners[0] << NO_COLOR << ", with " << maxPoints << " points!" << endl;
+        }
+        else if (winners.size() > 1) //If in the winners list there is more than one player name...
+        {
+            cout << "It's a tie between:";
+            for (const auto& winner : winners) {
+                cout << " Player " << GREEN << winner << NO_COLOR;
+            }
+            cout << " with " << maxPoints << " points each!" << endl;  //both of them are going to be the winners.
+        }
+    }
+
 }
 
 //================================================================================
