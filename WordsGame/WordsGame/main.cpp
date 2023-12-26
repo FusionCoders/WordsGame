@@ -46,9 +46,10 @@ public:
     Board(const string& filename); // constructor
     void show() const; // const method (NOTE: const methods cannot modify the attributes)
     vector<vector<pair<char, bool>>> getBoard() const;
+    void setLetterTrue(char row, char col);
     vector<pair<char, string>> getPlayableLetters() const;
     bool isValidPosition(char row, char col) const;
-    bool isValidInsertion(char row, char col, char letter, vector<char> playablePositions) const;
+    bool isValidInsertion(int row, int col, char letter) const;
     bool getEnd() const;
 private:
     vector<vector<pair<char, bool>>> b; //False --> letter not covered / True --> letter covered
@@ -100,6 +101,10 @@ vector<vector<pair<char, bool>>> Board::getBoard() const {
     return b;
 }
 
+void Board::setLetterTrue(char row, char col) {
+    this->b.at(row).at(col).second = true;
+}
+
 //--------------------------------------------------------------------------------
 // UNDERSTAND WHEN THE GAME IS OVER
 
@@ -114,28 +119,6 @@ bool Board::getEnd() const {
     }
     return gameOver;
 }
-
-//--------------------------------------------------------------------------------
-// VALIDATE THE POSITION ON BOARD
-
-bool Board::isValidPosition(char row, char col) const {
-    char maxRow = 'A' + static_cast<char>(b.size()) - 1;
-    char maxCol = 'a' + static_cast<char>(b.at(0).size()) - 1;
-
-    return (row >= 'A' && row <= maxRow && col >= 'a' && col <= maxCol);
-}
-
-//--------------------------------------------------------------------------------
-// VALIDATE IF LETTER FITS IN A CELL ON BOARD
-
-//bool Board::isValidInsertion(char row, char col, char letter, vector<char> playablePositions) const {
-//    if (letter == b.at(i).at(j).first) {
-//
-//    }
-//    char maxCol = 'a' + static_cast<char>(b.at(0).size()) - 1;
-//
-//    return ;
-//}
 
 //--------------------------------------------------------------------------------
 // GET A VECTOR WITH ALL LETTERS IN PLAYABLE POSITIONS AND RESPECTIVE POSITIONS
@@ -216,6 +199,40 @@ vector<pair<char, string>> Board::getPlayableLetters() const {
 }
 
 //--------------------------------------------------------------------------------
+// VALIDATE THE POSITION ON BOARD
+
+bool Board::isValidPosition(char row, char col) const {
+    char maxRow = 'A' + static_cast<char>(b.size()) - 1;
+    char maxCol = 'a' + static_cast<char>(b.at(0).size()) - 1;
+
+    return (row >= 'A' && row <= maxRow && col >= 'a' && col <= maxCol);
+}
+
+//--------------------------------------------------------------------------------
+// VALIDATE IF LETTER FITS IN A CELL ON BOARD
+
+bool Board::isValidInsertion(int row, int col, char letter) const {
+
+    vector<pair<char, string>> playableLet_Pos = getPlayableLetters();
+    vector<char> playableLetters;
+    vector<string> playablePositions;
+    for (int i = 0; i < playableLet_Pos.size(); i++) {
+        playableLetters.push_back(playableLet_Pos.at(i).first);
+        playablePositions.push_back(playableLet_Pos.at(i).second);
+    }
+    string position = to_string(row) + to_string(col);
+
+    if (find(playableLetters.begin(), playableLetters.end(), letter) != playableLetters.end()) {
+        if (find(playablePositions.begin(), playablePositions.end(), position) != playablePositions.end()) {
+            if (b.at(row).at(col).first == letter) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+//--------------------------------------------------------------------------------
 // SHOW
 
 void Board::show() const {
@@ -230,11 +247,18 @@ void Board::show() const {
     for (size_t i = 0; i < b.size(); i++)
     {
         cout << BLACK_B << WHITE << (char)('A' + i) << ' ';
-        for (size_t j = 0; j < b.at(i).size(); j++)
-            cout << BLACK << WHITE_B << b.at(i).at(j).first << ' ';
+        for (size_t j = 0; j < b.at(i).size(); j++) {
+            if (b.at(i).at(j).second == false) {
+                cout << BLACK << WHITE_B << b.at(i).at(j).first << ' ';
+            }
+            else {
+                cout << LIGHTRED << WHITE_B << b.at(i).at(j).first << ' ';
+            }
+            cout << BLACK_B;
+        }
         cout << endl;
+        cout << NO_COLOR << BLACK_B;
     }
-    cout << NO_COLOR << BLACK_B;
     cout << endl;
 }
 
@@ -319,6 +343,7 @@ public:
     Hand(vector<char> playerHand);
     Hand(int nLetters, Bag& letterBag);
     vector<char> getHandLetters();
+    void deleteLetter(char letter);
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
     bool validMoveExist(vector<pair<char, string>>& playableLetters);
     string readLetterToChange(int i);
@@ -352,6 +377,17 @@ Hand::Hand(vector<char> playerHand) {
 
 vector<char> Hand::getHandLetters() {
     return playerHand;
+}
+
+//--------------------------------------------------------------------------------
+// DELETE LETTER FROM THE HAND
+
+void Hand::deleteLetter(char letter) {
+    auto it = remove(playerHand.begin(), playerHand.end(), letter); // find the letter in the vector
+
+    if (it != playerHand.end()) {
+        playerHand.erase(it); // remove the letter from the hand
+    }
 }
 
 //--------------------------------------------------------------------------------
@@ -514,7 +550,7 @@ public:
     int getPoints() const;
     string getName() const;
     Hand getHand() const;
-    void play(Board& b, Bag& letterBag);
+    vector<char> play(Board& b, Bag& letterBag);
     void showPlayer() const;
     void printWinner() const;
 private:
@@ -581,39 +617,61 @@ Hand Player::getHand() const {
 //--------------------------------------------------------------------------------
 // PLAY LETTERS
 
-void Player::play(Board& b, Bag& letterBag) {
+vector<char> Player::play(Board& b, Bag& letterBag) {
+    
     bool isValidLetter = false;
-    string letterInput;
+    bool isValidPosition = false;
+    string letter, position;
+
     do {
         cout << "Letter (QUIT/PASS)? ";
-        if (getline(cin, letterInput)) {
-            if (letterInput == "QUIT") {
+        if (getline(cin, letter)) {
+            if (letter == "QUIT") {
                 throw "You quit the game!";
             }
-            else if (letterInput == "PASS") {
+            else if (letter == "PASS") {
                 cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
                 break;
             }
-            else if (letterInput.size() == 1) {
+            else if (letter.size() == 1) {
                 vector<char> playerHand = hand_.getHandLetters();
-                char letter = toupper(letterInput[0]);
-                if (find(playerHand.begin(), playerHand.end(), letter) != playerHand.end()) {
-                    /*vector<pair<char, string>> playableLet_Pos = b.getPlayableLetters();
-                    vector<char> playableLetters;
-                    vector<string> playablePositions;
-                    for (int i = 0; i < playableLet_Pos.size(); i++) {
-                        playableLetters.push_back(playableLet_Pos.at(i).first);
-                        playablePositions.push_back(playableLet_Pos.at(i).second);
-                    }*/
-                    //if (find(playableLetters.begin(), playableLetters.end(), letter) != playableLetters.end()) {
-                    //    //if (isValidInsertion(char row, char col, char letter, vector<char> playablePositions)) { // Verifify if the position is playable
-                    //    //                                                                                         // and the letter fits
-                    //      //  isValidLetter = true;
-                    //   // }
-                    //}
-                    //else {
-                    //    cout << RED << "The selected letter does not fit in any playbale position!" << endl << NO_COLOR;
-                    //}
+                if (find(playerHand.begin(), playerHand.end(), toupper(letter[0])) != playerHand.end()) { // check if the input letter is on the player hand
+                    isValidLetter = true;
+                    
+                    do {
+                        cout << "Position (Lc) (QUIT/PASS)? ";
+                        if (getline(cin, position)) {
+                            if (position == "QUIT") {
+                                throw "You quit the game!";
+                            }
+                            else if (position == "PASS") {
+                                cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
+                                break;
+                            }
+                            else if (position.size() == 2 && isalpha(position[0]) && isupper(position[0]) && isalpha(position[1]) && islower(position[1])) {
+                                if (b.isValidPosition(position[0], position[1])) {
+                                    int row = position[0] - 'A';  // convert the row character to an int ('A' to 0, 'B' to 1, etc.)
+                                    int col = position[1] - 'a';  // convert the column character to an int ('a' to 0, 'b' to 1, etc.)
+                                    if(b.isValidInsertion(row, col, toupper(letter[0]))) {
+                                        isValidPosition = true;
+                                        b.setLetterTrue(row, col); // sets the letter to true (covered) on the board
+                                        hand_.deleteLetter(toupper(letter[0])); // delete the inserted letter from the hand
+                                        return hand_.getHandLetters();
+                                    }
+                                    else {
+                                        cout << RED << "Invalid insertion! The letter can't be inserted in that position!" << endl << NO_COLOR;
+                                    }
+                                }
+                                else {
+                                    cout << RED << "Invalid postion! Please enter a position that exists on the board." << endl << NO_COLOR;
+                                }
+                            }
+                            else {
+                                cout << RED << "Invalid position format! Please enter a valid position in the format (Lc)." << endl << NO_COLOR;
+                            }
+                        }
+
+                    } while (!isValidPosition);
                 }
                 else {
                     cout << RED << "You can only select letters that are present in your hand!" << endl << NO_COLOR;
@@ -624,35 +682,6 @@ void Player::play(Board& b, Bag& letterBag) {
             }
         }
     } while (!isValidLetter);
-
-    bool isValidPosition = false;
-    string position;
-
-    do {
-        cout << "Position (Lc) (QUIT/PASS)? ";
-        if (getline(cin, position)) {
-            if (position == "QUIT") {
-                throw "You quit the game!";
-            }
-            else if (position == "PASS") {
-                cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
-                break;
-            }
-            else if (position.size() == 2 && isalpha(position[0]) && isupper(position[0]) && isalpha(position[1]) && islower(position[1])) {
-                if (b.isValidPosition(position[0], position[1])) {
-                    
-                    isValidPosition = true;
-                }
-                else {
-                    cout << RED << "Invalid postion! Please enter a position that exists on the board!" << endl << NO_COLOR;
-                }
-            }
-            else {
-                cout << RED << "Invalid input format. Please enter a valid position in the format (Lc) or QUIT/PASS." << endl << NO_COLOR;
-            }
-        }
-
-    } while (!isValidPosition);
 }
 
 //--------------------------------------------------------------------------------
@@ -744,7 +773,6 @@ void ListPlayer::showPlayers() const {
 }
 //---------------------------------------------------------------------------------
 //PRINT THE WINNER
-
 
 void printWinner(const vector<Player>& players) {
     if (players.size() == 1) { //If there is only one player playing, this one is going to be the winner of the game
@@ -842,6 +870,7 @@ int main() {
         cout << BLUE << "--------------------------------------NEW ROUND----------------------------------" << endl << NO_COLOR;
         for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
             cout << BLUE << "---------------------------------------PLAYER " << listPlayer.getListPlayers().at(i).getId() << "----------------------------------" << endl << NO_COLOR;
+            b.show();
             listPlayer.getListPlayers().at(i).getHand().showHand();
             try {
                 pair<vector<char>, bool> inf = listPlayer.getListPlayers().at(i).getHand().checkIfCanPlay(b, letterBag);
@@ -850,7 +879,10 @@ int main() {
                 listPlayer.setPlayer(i, player);
 
                 if (inf.second) { // if the player has valid moves
-                    listPlayer.getListPlayers().at(i).play(b, letterBag);
+                    vector<char> handLetters = listPlayer.getListPlayers().at(i).play(b, letterBag);
+                    Hand hand(handLetters);
+                    Player player(listPlayer.getListPlayers().at(i).getId(), listPlayer.getListPlayers().at(i).getPoints(), listPlayer.getListPlayers().at(i).getName(), hand);
+                    listPlayer.setPlayer(i, player);
                 }
             }
             catch(const char* message){

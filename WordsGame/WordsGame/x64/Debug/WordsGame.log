@@ -1,1 +1,4 @@
-﻿  WordsGame.vcxproj -> C:\Users\spard\source\repos\EDAWordGame\WordsGame\WordsGame\x64\Debug\WordsGame.exe
+﻿  main.cpp
+C:\temp\WordsGame\WordsGame\WordsGame\main.cpp(527): warning C4715: 'Hand::checkIfCanPlay': nem todos os caminhos de controle retornam um valor
+C:\temp\WordsGame\WordsGame\WordsGame\main.cpp(685): warning C4715: 'Player::play': nem todos os caminhos de controle retornam um valor
+  WordsGame.vcxproj -> C:\temp\WordsGame\WordsGame\x64\Debug\WordsGame.exe
