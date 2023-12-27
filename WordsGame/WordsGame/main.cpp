@@ -209,71 +209,71 @@ int Board::isLastLetter(int row, int col) {
     int points = 0;
 
     if (row != 0) {
-        // verifica para cima
+        // check up
         for (int i = row - 1; i >= 0; i--) {
-            if ((i == row - 1) && (!b.at(i).at(col).second || !isalpha(b.at(i).at(col).first))) {
-                lastLetter = false;
-                break;
+            if ((i == row - 1) && (!b.at(i).at(col).second || !isalpha(b.at(i).at(col).first))) { 
+                lastLetter = false; // found a letter not played or an empty cell in the first adjacent cell
+                break;              // so is not the last letter and breaks
             }
             else {
                 if (!b.at(i).at(col).second && isalpha(b.at(i).at(col).first)) {
-                    lastLetter = false; // Encontrou uma célula não marcada ou marcada como false
+                    lastLetter = false; // found a letter not played, so is not the last letter and breaks
                     break;
                 }
-                else if (!isalpha(b.at(i).at(col).first)) {
+                else if (!isalpha(b.at(i).at(col).first)) { // found an empty cell, so it breaks
                     break;
                 }
             }
         }
     }
-    // Verifica para baixo
+    // check down
     if ((lastLetter || row == 0) && row < b.size() - 1) {
         for (int i = row + 1; i < b.size(); i++) {
             if (!b.at(i).at(col).second && isalpha(b.at(i).at(col).first)) {
-                lastLetter = false; // Encontrou uma célula não marcada ou marcada como false
+                lastLetter = false; // found a letter not played, so is not the last letter and breaks
                 break;
             }
-            else if (!isalpha(b.at(i).at(col).first)) {
+            else if (!isalpha(b.at(i).at(col).first)) { // found an empty cell, so it breaks
                 break;
             }
         }
     }
-    if (lastLetter) {
+    if (lastLetter) { // if it is the last letter of a vertical word sums a point
         points ++;
     }
 
     lastLetter = true;
-    // verifica para a esquerda
+    // check left
     if (col != 0) {
         for (int j = col - 1; j >= 0; j--) {
             if ((j == col - 1) && (!b.at(row).at(j).second || !isalpha(b.at(row).at(j).first))) {
-                lastLetter = false; // Encontrou uma célula não marcada ou marcada como false
-                break;
+                lastLetter = false; // found a letter not played or an empty cell in the first adjacent cell
+                break;              // so is not the last letter and breaks
             }
             else {
                 if (!b.at(row).at(j).second && isalpha(b.at(row).at(j).first)) {
-                    lastLetter = false; // Encontrou uma célula não marcada ou marcada como false
+                    lastLetter = false; // found a letter not played, so is not the last letter and breaks
                     break;
                 }
-                else if (!isalpha(b.at(row).at(j).first)) {
+                else if (!isalpha(b.at(row).at(j).first)) { // found an empty cell, so it breaks
                     break;
                 }
             }
         }
     }
-    // verifica para a direita
+    // check right
     if ((lastLetter || col == 0) && col < b.at(0).size() - 1) {
         for (int j = col + 1; j < b.at(0).size(); j++) {
             if (!b.at(row).at(j).second && isalpha(b.at(row).at(j).first)) {
-                lastLetter = false; // Encontrou uma célula não marcada ou marcada como false
-                break;
+                lastLetter = false; /// found a letter not played, so is not the last letter and breaks
+                break;             
             }
-            else if (!isalpha(b.at(row).at(j).first)) {
+            else if (!isalpha(b.at(row).at(j).first)) { // found an empty cell, so it breaks
                 break;
             }
         }
     }
-    if (lastLetter) {
+    if (lastLetter) { // if it is the last letter of a horizontal word sums a point
         points ++;
     }
     if (points == 1) {
@@ -1054,7 +1054,6 @@ int main() {
             }
         }
     }
-
     cout << GREEN << "\n\n--------------------------------------END OF THE GAME--------------------------------------" << endl << NO_COLOR;
     listPlayer.printWinner();
     
