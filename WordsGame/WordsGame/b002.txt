@@ -1,0 +1,19 @@
+BOARD SIZE : 9 × 8
+
+BOARD :
+
+  a b c d e f g h 
+A . . . . . A . E
+B . . . . . M . T
+C . . . . . E L H 
+D . . . . . N . I 
+E . . . . . . . C 
+F . . . . . . . . 
+G . . . . . . . .
+H . . . . . . . .
+I . . . . . . . .
+
+
+WORDS :
+
+AhV ETHIC

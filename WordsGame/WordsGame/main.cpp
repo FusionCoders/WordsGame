@@ -113,11 +113,13 @@ void Board::setLetterTrue(char row, char col) {
 bool Board::getEnd() const {
     bool gameOver = true;
     for (int i = 0; i < b.size(); i++) {
-        gameOver = all_of(b.at(i).begin(), b.at(i).end(), [](const pair<char, bool>& p) {
-            return p.first != ' ' || (p.first != ' ' && p.second == true);
-            });
-        if (!gameOver)
-            break;
+        for (int j = 0; j < b.at(0).size(); j++) {
+            pair<char, bool> cell = b.at(i).at(j);
+            if (isalpha(cell.first) && cell.second == false) {
+                gameOver = false;
+                break;
+            }
+        }
     }
     return gameOver;
 }
@@ -219,7 +221,6 @@ int Board::isLastLetter(int row, int col) {
                     break;
                 }
                 else if (!isalpha(b.at(i).at(col).first)) {
-                    //cout << "adeus" << endl;
                     break;
                 }
             }
@@ -227,7 +228,7 @@ int Board::isLastLetter(int row, int col) {
     }
     // Verifica para baixo
     if ((lastLetter || row == 0) && row < b.size() - 1) {
-        for (int i = row + 1; i <= b.size(); i++) {
+        for (int i = row + 1; i < b.size(); i++) {
             if (!b.at(i).at(col).second && isalpha(b.at(i).at(col).first)) {
                 lastLetter = false; // Encontrou uma célula não marcada ou marcada como false
                 break;
@@ -262,7 +263,7 @@ int Board::isLastLetter(int row, int col) {
     }
     // verifica para a direita
     if ((lastLetter || col == 0) && col < b.at(0).size() - 1) {
-        for (int j = col + 1; j <= b.at(0).size(); j++) {
+        for (int j = col + 1; j < b.at(0).size(); j++) {
             if (!b.at(row).at(j).second && isalpha(b.at(row).at(j).first)) {
                 lastLetter = false; // Encontrou uma célula não marcada ou marcada como false
                 break;
@@ -654,8 +655,13 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
 
 void Hand::showHand() const {
     cout << "List of letters in the hand: ";
-    for (char letter : playerHand) {
-        cout << letter << ' ';
+    if (playerHand.size() == 0) {
+        cout << "your hand is empty.";
+    }
+    else {
+        for (char letter : playerHand) {
+            cout << letter << ' ';
+        }
     }
     cout << endl;
 }
@@ -675,7 +681,6 @@ public:
     Hand getHand() const;
     pair<vector<char>, int>  play(Board& b, Bag& letterBag);
     void showPlayer() const;
-    void printWinner() const;
 private:
     int id_;
     int points_;
@@ -782,7 +787,6 @@ pair<vector<char>, int>  Player::play(Board& b, Bag& letterBag) {
                                             b.setLetterTrue(row, col); // sets the letter to true (covered) on the board
                                             hand_.deleteLetter(toupper(letter[0])); // delete the inserted letter from the hand 
                                             points_ = b.isLastLetter(row, col);
-                                            b.show();
                                             return make_pair(hand_.getHandLetters(), points_);
                                         }
                                         else {
@@ -838,6 +842,7 @@ public:
     vector<Player> getListPlayers() const;
     void setPlayer(int i, Player player);
     void deletePlayer(int i);
+    void printWinner() const;
     void showPlayers() const;
 private:
     vector<Player> playersList;
@@ -906,40 +911,36 @@ void ListPlayer::showPlayers() const {
 //---------------------------------------------------------------------------------
 //PRINT THE WINNER
 
-void printWinner(const ListPlayer& listPlayer) {
-    vector<Player> players = listPlayer.getListPlayers();
-    if (players.size() == 1) { //If there is only one player playing, this one is going to be the winner of the game
-        cout << "The winner is: " << GREEN << players[0].getName() << NO_COLOR << "!";
+void ListPlayer::printWinner() const {
+    if (playersList.size() == 1) { // if there is only one player playing, this one is going to be the winner of the game
+        cout << "The winner is: " << GREEN << playersList[0].getName() << NO_COLOR << "!";
         cout << endl;
     }
 
-    else { //If there are more players playing... 
+    else { // if there are more players playing... 
         int maxPoints = 0;
-        vector<string> winners; //This is a list that will save the names of the winners
+        vector<string> winners; // this is a list that will save the names of the winners
 
-        for (const auto& player : players) {
-            if (player.getPoints() > maxPoints) //If the number of points is greater than the "maxPoints", "maxPoints" its going to be updated with this new points, until it reaches the maximum
-            {
+        for (const auto& player : playersList) {
+            if (player.getPoints() > maxPoints) { // if the number of points is greater than the "maxPoints", "maxPoints" its going to be updated with this new points, until it reaches the maximum
                 maxPoints = player.getPoints();
-                winners.push_back(player.getName()); //Gets the name of the player with this Maximum points.
-
-            }
-            else if (player.getPoints() == maxPoints) //If the players have the same points...
-            {
-                winners.push_back(player.getName()); //Their names are going to be saved on the winners list.
             }
         }
-        if (winners.size() == 1) //If the list of winners has only one name, this player is going to be the winnner
-        {
-            cout << "The winner is: " << GREEN << winners[0] << NO_COLOR << ", with " << maxPoints << " points!" << endl;
+        for (const auto& player : playersList) {
+            if (player.getPoints() == maxPoints)
+                winners.push_back(player.getName()); // gets the name of the player with this Maximum points
         }
-        else if (winners.size() > 1) //If in the winners list there is more than one player name...
+        if (winners.size() == 1) // if the list of winners has only one name, this player is going to be the winnner
         {
-            cout << "It's a tie between:";
+            cout << "\n\nThe winner is: Player " << GREEN << winners[0] << NO_COLOR << ", with " << maxPoints << " point(s)!" << endl;
+        }
+        else if (winners.size() > 1) // if in the winners list there is more than one player name...
+        {
+            cout << "\n\nIt's a tie between:";
             for (const auto& winner : winners) {
                 cout << " Player " << GREEN << winner << NO_COLOR;
             }
-            cout << " with " << maxPoints << " points each!" << endl;  //both of them are going to be the winners.
+            cout << " with " << maxPoints << " point(s) each!" << endl;  // both of them are going to be the winners.
         }
     }
 
@@ -1016,6 +1017,7 @@ int main() {
                
                     do {
                         if (count != 0) { // if is not the first play it shows the new hand
+                            b.show();
                             listPlayer.getListPlayers().at(i).getHand().showHand();
                         }
 
@@ -1052,8 +1054,9 @@ int main() {
             }
         }
     }
-    //printWinner(listPlayer);
-    cout << GREEN << "END OF THE GAME" << endl << NO_COLOR;
 
+    cout << GREEN << "\n\n--------------------------------------END OF THE GAME--------------------------------------" << endl << NO_COLOR;
+    listPlayer.printWinner();
+    
     return 0;
 }
