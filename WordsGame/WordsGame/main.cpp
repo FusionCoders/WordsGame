@@ -345,7 +345,7 @@ public:
     vector<char> getHandLetters();
     void deleteLetter(char letter);
     pair<vector<char>, bool> checkIfCanPlay(Board& b, Bag& letterBag);
-    bool validMoveExist(vector<pair<char, string>> playableLetters);
+    bool validMoveExist(Board& b);
     string readLetterToChange(int i);
     bool changeHand(string& lettersSelected, Bag& letterbag);
     void showHand() const;
@@ -393,8 +393,8 @@ void Hand::deleteLetter(char letter) {
 //--------------------------------------------------------------------------------
 // CHECK IF THERE IS A VALID MOVE
 
-bool Hand::validMoveExist(vector<pair<char, string>> playableLetters) {
-    //vector<pair<char, string>> playableLetters = b.getPlayableLetters();
+bool Hand::validMoveExist(Board& b) {
+    vector<pair<char, string>> playableLetters = b.getPlayableLetters();
     for (int i = 0; i < playableLetters.size(); i++) {
         for (char ch2 : playerHand) {
             if (playableLetters.at(i).first == ch2) {
@@ -479,8 +479,8 @@ string Hand::readLetterToChange(int i) {
 // CHECK IF CAN PLAY
 
 pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
-    vector<pair<char, string>> playableLetters = b.getPlayableLetters();
-    if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
+   // vector<pair<char, string>> playableLetters = b.getPlayableLetters();
+    if (validMoveExist(b)) { // it is true if there is a valid move so the player can play
         return make_pair(playerHand, true);
     }
     else { // if there is no valid moves it asks for substitutions in the hand                                              
@@ -516,7 +516,7 @@ pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
                 else
                     isValid = changeHand(selectedLetters, letterbag); // do the substitution and it returns true if the substitution was completed correctely            
             } while (!isValid);
-            if (validMoveExist(playableLetters)) { // it is true if there is a valid move so the player can play
+            if (validMoveExist(b)) { // it is true if there is a valid move so the player can play
                 return make_pair(playerHand, true);
             }
             else {
@@ -892,8 +892,8 @@ int main() {
                         count++;
                         cout << count;
                         listPlayer.getListPlayers().at(i).getHand().showHand();
-                        vector<pair<char, string>> playableLetters = b.getPlayableLetters();
-                        if (!listPlayer.getListPlayers().at(i).getHand().validMoveExist(playableLetters) && count < 2) { // if there is a valid move the player can play a 2nd time
+                        //vector<pair<char, string>> playableLetters = b.getPlayableLetters();
+                        if (!listPlayer.getListPlayers().at(i).getHand().validMoveExist(b) && count < 2) { // if there is a valid move the player can play a 2nd time
                             cout << BLUE << "There is no more play options!" << endl << NO_COLOR;
                             break; // stop the do - while if there is no more valid moves
                         }
