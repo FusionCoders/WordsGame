@@ -514,10 +514,10 @@ vector<char> Hand::addLetters(Bag& letterbag, int numLettersToAdd) {
     vector<char> bagLetters = letterbag.getLetters(); // gets the letters from the bag
     
     if (bagLetters.size() == 0) {
-        cout << BLUE << "There are no left letters in the bag." << NO_COLOR << endl;
+        cout << "\nThere are no left letters in the bag." << NO_COLOR << endl;
     }
     else {
-        cout << BLUE << "Drawing letters from the bag..." << NO_COLOR << endl;
+        cout << "\nDrawing letters from the bag..." << NO_COLOR << endl;
         for (int i = 0; i < numLettersToAdd && i < bagLetters.size(); ++i) { // adds the specified number of letters to the hand from the bag
             playerHand.push_back(bagLetters[i]);
         }
@@ -765,7 +765,7 @@ pair<vector<char>, int>  Player::play(Board& b, Bag& letterBag) {
             else if (letter.size() == 1) {
                 vector<char> playerHand = hand_.getHandLetters();
                 if (find(playerHand.begin(), playerHand.end(), toupper(letter[0])) != playerHand.end()) { // check if the input letter is on the player hand
-                    if (b.isPlayableLetter(toupper(letter[0]))) {
+                    if (b.isPlayableLetter(toupper(letter[0]))) { // check if the letter is playable
                         isValidLetter = true;
 
                         do {
@@ -780,8 +780,8 @@ pair<vector<char>, int>  Player::play(Board& b, Bag& letterBag) {
                                 }
                                 else if (position.size() == 2 && isalpha(position[0]) && isupper(position[0]) && isalpha(position[1]) && islower(position[1])) {
                                     if (b.isValidPosition(position[0], position[1])) {
-                                        int row = position[0] - 'A';  // convert the row character to an int ('A' to 0, 'B' to 1, etc.)
-                                        int col = position[1] - 'a';  // convert the column character to an int ('a' to 0, 'b' to 1, etc.)
+                                        int row = position[0] - 'A';  // convert the row character to an int
+                                        int col = position[1] - 'a';  // convert the column character to an int
                                         if (b.isValidInsertion(row, col, toupper(letter[0]))) {
                                             isValidPosition = true;
                                             b.setLetterTrue(row, col); // sets the letter to true (covered) on the board
@@ -928,7 +928,7 @@ void ListPlayer::printWinner() const {
         }
         for (const auto& player : playersList) {
             if (player.getPoints() == maxPoints)
-                winners.push_back(player.getName()); // gets the name of the player with this Maximum points
+                winners.push_back(player.getName()); // gets the name of the player with the maximum points
         }
         if (winners.size() == 1) // if the list of winners has only one name, this player is going to be the winnner
         {
@@ -940,7 +940,7 @@ void ListPlayer::printWinner() const {
             for (const auto& winner : winners) {
                 cout << " Player " << GREEN << winner << NO_COLOR;
             }
-            cout << " with " << maxPoints << " point(s) each!" << endl;  // both of them are going to be the winners.
+            cout << " with " << maxPoints << " point(s) each!" << endl;  // both of them are going to be the winners
         }
     }
 
