@@ -1,3 +1,5 @@
 ﻿  main.cpp
-C:\temp\WordsGame\WordsGame\WordsGame\main.cpp(528): warning C4715: 'Hand::checkIfCanPlay': nem todos os caminhos de controle retornam um valor
+C:\temp\WordsGame\WordsGame\WordsGame\main.cpp(468,63): warning C4267: 'argumento': conversão de 'size_t' para 'int', possível perda de dados
+C:\temp\WordsGame\WordsGame\WordsGame\main.cpp(651): warning C4715: 'Hand::checkIfCanPlay': nem todos os caminhos de controle retornam um valor
+C:\temp\WordsGame\WordsGame\WordsGame\main.cpp(817): warning C4715: 'Player::play': nem todos os caminhos de controle retornam um valor
   WordsGame.vcxproj -> C:\temp\WordsGame\WordsGame\x64\Debug\WordsGame.exe
