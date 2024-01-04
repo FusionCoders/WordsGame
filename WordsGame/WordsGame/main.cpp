@@ -762,7 +762,7 @@ pair<vector<char>, int>  Player::play(Board& b, Bag& letterBag) {
                 cout << BLUE << "You passed your turn!" << endl << NO_COLOR;
                 return make_pair(hand_.getHandLetters(), -1);
             }
-            else if (letter.size() == 1) {
+            else if (letter.size() == 1 && isalpha(letter[0])) {
                 vector<char> playerHand = hand_.getHandLetters();
                 if (find(playerHand.begin(), playerHand.end(), toupper(letter[0])) != playerHand.end()) { // check if the input letter is on the player hand
                     if (b.isPlayableLetter(toupper(letter[0]))) { // check if the letter is playable
@@ -876,7 +876,7 @@ ListPlayer::ListPlayer(int nLetters, Bag& letterBag) {
         Player p(i, nLetters, letterBag);
         playersList.push_back(p);
     }
-    cout << "aqui9";
+    
     cout << endl;
 }
 
@@ -1003,7 +1003,7 @@ int main() {
     while (!b.getEnd() && listPlayer.getListPlayers().size() != 1) {
         cout << BLUE << "--------------------------------------NEW ROUND----------------------------------" << endl << NO_COLOR;
         for (int i = 0; i < listPlayer.getListPlayers().size(); i++) {
-            cout << BLUE << "---------------------------------------PLAYER " << listPlayer.getListPlayers().at(i).getId() << "----------------------------------" << endl << NO_COLOR;
+            cout << BLUE << "---------------------------------------PLAYER " << listPlayer.getListPlayers().at(i).getName() << "----------------------------------" << endl << NO_COLOR;
             b.show();
             listPlayer.getListPlayers().at(i).getHand().showHand();
             try {
