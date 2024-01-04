@@ -3,12 +3,12 @@ BOARD SIZE : 9 × 8
 BOARD :
 
   a b c d e f g h 
-A . . . . . A . E
-B . . . . . M . T
-C . . . . . E L H 
-D . . . . . N . I 
-E . . . . . . . C 
-F . . . . . . . . 
+A A M A . . A . .
+B A . . . . A . E
+C R . . . . H . T 
+D C . . . . . . H 
+E O . C A . . . I 
+F . . . B A S I C 
 G . . . . . . . .
 H . . . . . . . .
 I . . . . . . . .
@@ -16,4 +16,6 @@ I . . . . . . . .
 
 WORDS :
 
+AfV AAH
 AhV ETHIC
+FdH BASIC

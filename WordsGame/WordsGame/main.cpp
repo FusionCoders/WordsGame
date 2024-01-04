@@ -229,12 +229,19 @@ int Board::isLastLetter(int row, int col) {
     // check down
     if ((lastLetter || row == 0) && row < b.size() - 1) {
         for (int i = row + 1; i < b.size(); i++) {
-            if (!b.at(i).at(col).second && isalpha(b.at(i).at(col).first)) {
-                lastLetter = false; // found a letter not played, so is not the last letter and breaks
+            if ((row == 0 && i == row + 1) && (!b.at(i).at(col).second || !isalpha(b.at(i).at(col).first))) {
+                lastLetter = false; // found a letter not played or an empty cell in the first adjacent cell
                 break;
             }
-            else if (!isalpha(b.at(i).at(col).first)) { // found an empty cell, so it breaks
-                break;
+            else {
+                if (!b.at(i).at(col).second && isalpha(b.at(i).at(col).first)) {
+                    lastLetter = false; // found a letter not played, so is not the last letter and breaks
+                    break;
+                }
+                else if (!isalpha(b.at(i).at(col).first)) { // found an empty cell, so it breaks
+                    break;
+                }
+
             }
         }
     }
@@ -264,12 +271,19 @@ int Board::isLastLetter(int row, int col) {
     // check right
     if ((lastLetter || col == 0) && col < b.at(0).size() - 1) {
         for (int j = col + 1; j < b.at(0).size(); j++) {
-            if (!b.at(row).at(j).second && isalpha(b.at(row).at(j).first)) {
-                lastLetter = false; /// found a letter not played, so is not the last letter and breaks
-                break;             
+            if ((col == 0 && j == col + 1) && (!b.at(row).at(j).second || !isalpha(b.at(row).at(j).first))) {
+                lastLetter = false; // found a letter not played or an empty cell in the first adjacent cell
+                break;              // so is not the last letter and breaks
             }
-            else if (!isalpha(b.at(row).at(j).first)) { // found an empty cell, so it breaks
-                break;
+            else {
+                if (!b.at(row).at(j).second && isalpha(b.at(row).at(j).first)) {
+                    lastLetter = false; /// found a letter not played, so is not the last letter and breaks
+                    break;
+                }
+                else if (!isalpha(b.at(row).at(j).first)) { // found an empty cell, so it breaks
+                    break;
+                }
+
             }
         }
     }
@@ -551,7 +565,7 @@ bool Hand::changeHand(string& lettersSelected, Bag& letterbag) {
                     vector<char> newBag = letterbag.getLetters();
                     ch = newBag.at(t);
                     newBag.at(t) = old;
-                    letterbag.setLetters(newBag); //DEVIA-SE FAZER NO FIM DE TUDO
+                    letterbag.setLetters(newBag); 
                     break;  // stop after first substitution;
                 }
             }
@@ -603,7 +617,7 @@ string Hand::readLetterToChange(int i) {
 // CHECK IF CAN PLAY
 
 pair<vector<char>, bool> Hand::checkIfCanPlay(Board& b, Bag& letterbag) {
-       if (validMoveExist(b)) { // it is true if there is a valid move so the player can play
+    if (validMoveExist(b)) { // it is true if there is a valid move so the player can play
         return make_pair(playerHand, true);
     }
     else { // if there is no valid moves it asks for substitutions in the hand                                              
@@ -1055,7 +1069,9 @@ int main() {
         }
     }
     cout << GREEN << "\n\n--------------------------------------END OF THE GAME--------------------------------------" << endl << NO_COLOR;
+    listPlayer.showPlayers();
     listPlayer.printWinner();
+
     
     return 0;
 }
