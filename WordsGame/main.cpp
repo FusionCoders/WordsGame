@@ -1,5 +1,5 @@
 //Group 12:
-// - Bárbara Teixeira (UP202209742)
+// - Bï¿½rbara Teixeira (UP202209742)
 // - Diogo Bastos (UP202202425)
 // - Sara Vidal (UP202202427)
 
